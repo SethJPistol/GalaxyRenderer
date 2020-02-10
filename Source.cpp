@@ -6,54 +6,56 @@
 #include <fstream>	//For strings and other stuff
 #include <sstream>
 
+#include "Camera.h"
 #include "Cube.h"
 
 #define COLOR_SPEED 0.025f
+#define CAMERA_SPEED 0.03f
 
 
-void ShaderCompileCheck(unsigned int shader_ID, const char* error_message)
+void ShaderCompileCheck(unsigned int shaderID, const char* errorMessage)
 {
 	//Check it worked
 	GLint success = GL_FALSE;
-	glGetShaderiv(shader_ID, GL_COMPILE_STATUS, &success);
+	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
 	if (success == GL_FALSE)
 	{
 		//Get the length of the OpenGL error message
-		GLint log_length = 0;
-		glGetShaderiv(shader_ID, GL_INFO_LOG_LENGTH, &log_length);
+		GLint logLength = 0;
+		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logLength);
 		//Create the error buffer
-		char* log = new char[log_length];
+		char* log = new char[logLength];
 		//Copy the error from the buffer
-		glGetShaderInfoLog(shader_ID, log_length, 0, log);
+		glGetShaderInfoLog(shaderID, logLength, 0, log);
 
 		//Create the error message
-		std::string full_error_message(log);
-		full_error_message += error_message;
-		full_error_message += "\n";
-		printf(full_error_message.c_str());
+		std::string full_errorMessage(log);
+		full_errorMessage += errorMessage;
+		full_errorMessage += "\n";
+		printf(full_errorMessage.c_str());
 		//Clean up anyways
 		delete[] log;
 	}
 }
-void ShaderProgramLinkCheck(unsigned int program_ID, const char* error_message)
+void ShaderProgramLinkCheck(unsigned int programID, const char* errorMessage)
 {
 	GLint success = GL_FALSE;
-	glGetProgramiv(program_ID, GL_LINK_STATUS, &success);
+	glGetProgramiv(programID, GL_LINK_STATUS, &success);
 	if (!success)
 	{
 		//Get the length of the OpenGL error message
-		GLint log_length = 0;
-		glGetProgramiv(program_ID, GL_INFO_LOG_LENGTH, &log_length);
+		GLint logLength = 0;
+		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &logLength);
 		//Create the error buffer
-		char* log = new char[log_length];
+		char* log = new char[logLength];
 		//Copy the error from the buffer
-		glGetProgramInfoLog(program_ID, log_length, 0, log);
+		glGetProgramInfoLog(programID, logLength, 0, log);
 
 		//Create the error message
-		std::string full_error_message(log);
-		full_error_message += error_message;
-		full_error_message += "\n";
-		printf(full_error_message.c_str());
+		std::string full_errorMessage(log);
+		full_errorMessage += errorMessage;
+		full_errorMessage += "\n";
+		printf(full_errorMessage.c_str());
 		//Clean up anyways
 		delete[] log;
 	}
@@ -97,76 +99,75 @@ int main()
 
 
 	//CAMERA
-	//The projection matrix, representing the lens of the camera, created with FOV, screen aspect ratio, and near and far of the frustum
-	glm::mat4 projection = glm::perspective(1.507f, 16.0f / 9.0f, 0.1f, 5.0f);
-	//View matrix, the inverse of the camera's world transform
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 1, 2), glm::vec3(0), glm::vec3(0, 1, 0));
-	//The model's local transform, set to the identity matrix
 	glm::mat4 model = glm::mat4(1);
+	Camera* pCamera = new Camera();
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);	//Hide the mouse cursor in the window so we can look around with the camera
+	glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 
 	//SHADERS
-	unsigned int vertex_shader_ID = 0;
-	unsigned int fragment_shader_ID = 0;
-	unsigned int shader_program_ID = 0;
+	unsigned int vertexShaderID = 0;
+	unsigned int fragmentShaderID = 0;
+	unsigned int shaderProgramID = 0;
 
 	//VERTEX SHADER
 	//Load shader into string
-	std::string shader_data;
-	std::ifstream in_file_stream("Shaders\\simple_vertex_shader.glsl", std::ifstream::in);
+	std::string shaderData;
+	std::ifstream inFileStream("Shaders\\simple_vertex_shader.glsl", std::ifstream::in);
 
 	//Load source into string for compilation
-	std::stringstream string_stream;
-	if (in_file_stream.is_open())
+	std::stringstream stringStream;
+	if (inFileStream.is_open())
 	{
-		string_stream << in_file_stream.rdbuf();
-		shader_data = string_stream.str();
-		in_file_stream.close();
+		stringStream << inFileStream.rdbuf();
+		shaderData = stringStream.str();
+		inFileStream.close();
 	}
 
-	vertex_shader_ID = glCreateShader(GL_VERTEX_SHADER);	//Allocate space for a vertex shader
-	const char* data = shader_data.c_str();	//Convert to raw c string
-	glShaderSource(vertex_shader_ID, 1, (const GLchar**)&data, 0);	//Send it to the shader location
-	glCompileShader(vertex_shader_ID);	//Build the shader
+	vertexShaderID = glCreateShader(GL_VERTEX_SHADER);	//Allocate space for a vertex shader
+	const char* data = shaderData.c_str();	//Convert to raw c string
+	glShaderSource(vertexShaderID, 1, (const GLchar**)&data, 0);	//Send it to the shader location
+	glCompileShader(vertexShaderID);	//Build the shader
 
 	//Check it worked
-	ShaderCompileCheck(vertex_shader_ID, "VERTEX SHADER FAILED TO COMPILE");
+	ShaderCompileCheck(vertexShaderID, "VERTEX SHADER FAILED TO COMPILE");
 
 
 	//FRAGMENT SHADER
 	//Load shader into string
-	std::ifstream in_file_stream_frag("Shaders\\simple_fragment_shader.glsl", std::ifstream::in);
+	std::ifstream inFileStreamFrag("Shaders\\simple_fragment_shader.glsl", std::ifstream::in);
 	
 	//Load source into string for compilation
-	std::stringstream string_stream_frag;
-	if (in_file_stream_frag.is_open())
+	std::stringstream stringStream_frag;
+	if (inFileStreamFrag.is_open())
 	{
-		string_stream_frag << in_file_stream_frag.rdbuf();
-		shader_data = string_stream_frag.str();
-		in_file_stream_frag.close();
+		stringStream_frag << inFileStreamFrag.rdbuf();
+		shaderData = stringStream_frag.str();
+		inFileStreamFrag.close();
 	}
 
-	fragment_shader_ID = glCreateShader(GL_FRAGMENT_SHADER);	//Allocate space for a vertex shader
-	data = shader_data.c_str();	//Convert to raw c string
-	glShaderSource(fragment_shader_ID, 1, (const GLchar**)&data, 0);	//Send it to the shader location
-	glCompileShader(fragment_shader_ID);	//Build the shader
+	fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);	//Allocate space for a vertex shader
+	data = shaderData.c_str();	//Convert to raw c string
+	glShaderSource(fragmentShaderID, 1, (const GLchar**)&data, 0);	//Send it to the shader location
+	glCompileShader(fragmentShaderID);	//Build the shader
 
 	//Check it worked
-	ShaderCompileCheck(fragment_shader_ID, "FRAGMENT SHADER FAILED TO COMPILE");
+	ShaderCompileCheck(fragmentShaderID, "FRAGMENT SHADER FAILED TO COMPILE");
 
 	//SHADER PROGRAM
 	//Now the IDs are validated, they can be linked
-	shader_program_ID = glCreateProgram();	//Create the new shader program
-	glAttachShader(shader_program_ID, vertex_shader_ID);	//Attach shader by ID and type
-	glAttachShader(shader_program_ID, fragment_shader_ID);	//Attach shader by ID and type
-	glLinkProgram(shader_program_ID);	//Link the two programs
+	shaderProgramID = glCreateProgram();	//Create the new shader program
+	glAttachShader(shaderProgramID, vertexShaderID);	//Attach shader by ID and type
+	glAttachShader(shaderProgramID, fragmentShaderID);	//Attach shader by ID and type
+	glLinkProgram(shaderProgramID);	//Link the two programs
 
 	//Check it worked
-	ShaderProgramLinkCheck(shader_program_ID, "SHADER PROGRAM FAILED TO LINK");
+	ShaderProgramLinkCheck(shaderProgramID, "SHADER PROGRAM FAILED TO LINK");
 
 
 	//COLOR
-	int color_direction = 1;
+	int colorDirection = 1;
 	float r = COLOR_SPEED;
 	float g = COLOR_SPEED;
 	float b = COLOR_SPEED;
@@ -175,37 +176,49 @@ int main()
 	glPolygonMode(GL_BACK, GL_LINE);	//Set to render in wireframe mode
 
 
+	//DELTATIME
+	float deltaTime = 0.0f;
+	float lastFrame = 0.0f;
+
+
 	//GAME LOOP
 	while (glfwWindowShouldClose(window) == false && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear the back buffer every frame, to avoid leftover visuals
 
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+		
 		model = glm::rotate(model, 0.016f, glm::vec3(0, 1, 0));	//Rotate the model
 
-		glm::mat4 pv = projection * view;
+		//CAMERA MOVEMENT
+		pCamera->Update(deltaTime);
+
+		glm::mat4 pv = pCamera->GetPV();
 
 		//Calculate color this frame
 		if (r  > 0.0f && r < 1.0f)
-			r += COLOR_SPEED * color_direction;
+			r += COLOR_SPEED * colorDirection;
 		else if (b > 0.0f && b < 1.0f)
-			b += COLOR_SPEED * color_direction;
+			b += COLOR_SPEED * colorDirection;
 		else if (g > 0.0f && g < 1.0f)
-			g += COLOR_SPEED * color_direction;
+			g += COLOR_SPEED * colorDirection;
 		else
 		{
-			color_direction = -color_direction;
-			r = b = g += (COLOR_SPEED * color_direction);
+			colorDirection = -colorDirection;
+			r = b = g += (COLOR_SPEED * colorDirection);
 		}
 		glm::vec4 color = glm::vec4(r, g, b, 0.0f);
 
 		//Use the shaders
-		glUseProgram(shader_program_ID);	//Use the shader program, now it is bound
+		glUseProgram(shaderProgramID);	//Use the shader program, now it is bound
 		//Set the transforms, must be done before drawing the arrays
-		auto uniform_location = glGetUniformLocation(shader_program_ID, "projection_view_matrix");
+		auto uniform_location = glGetUniformLocation(shaderProgramID, "projection_view_matrix");
 		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pv));
-		uniform_location = glGetUniformLocation(shader_program_ID, "model_matrix");
+		uniform_location = glGetUniformLocation(shaderProgramID, "model_matrix");
 		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(model));
-		uniform_location = glGetUniformLocation(shader_program_ID, "color");
+		uniform_location = glGetUniformLocation(shaderProgramID, "color");
 		glUniform4fv(uniform_location, 1, glm::value_ptr(color));
 
 
@@ -219,6 +232,7 @@ int main()
 
 
 	//Clearing memory
+	delete pCamera;
 	delete pCube;
 
 	glfwDestroyWindow(window);

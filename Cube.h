@@ -22,6 +22,6 @@ private:
 	unsigned int m_VBO;	//Vertex Buffer Object, to store the array of points for the geometry
 	unsigned int m_IBO;	//Index Buffer Object, to store the indexes of the verts we want to draw
 
-	int m_vertex_amount;
-	int m_index_amount;
+	int m_vertexAmount;
+	int m_indexAmount;
 };
