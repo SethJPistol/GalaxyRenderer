@@ -31,4 +31,6 @@ private:
 	float m_rotateSpeed;
 
 	double m_prevMouseX, m_prevMouseY;
+
+	bool m_mouseHeld = false;
 };

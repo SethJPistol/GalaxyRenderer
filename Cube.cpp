@@ -50,16 +50,6 @@ Cube::Cube()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-Cube::Cube(glm::vec3 position)
-{
-
-}
-
-Cube::Cube(float scale)
-{
-
-}
-
 Cube::~Cube()
 {
 	//Clearing memory

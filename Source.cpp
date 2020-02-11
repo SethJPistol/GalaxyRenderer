@@ -8,6 +8,7 @@
 
 #include "Camera.h"
 #include "Cube.h"
+#include "Shape.h"
 
 #define COLOR_SPEED 0.025f
 #define CAMERA_SPEED 0.03f
@@ -95,15 +96,15 @@ int main()
 
 
 	//MAKE MESHES
-	Cube* pCube = new Cube();
+	Shape* pCube = new Shape(Shape::DrawMode::eCube);
+	Shape* pCube2 = new Shape(Shape::DrawMode::eCube);
+	pCube2->SetPosition(glm::vec3(-1.2f, 0.0f, 0.0f));
+	//Cube* pCube = new Cube();
 
 
 	//CAMERA
 	glm::mat4 model = glm::mat4(1);
 	Camera* pCamera = new Camera();
-
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);	//Hide the mouse cursor in the window so we can look around with the camera
-	glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 
 	//SHADERS
@@ -186,11 +187,11 @@ int main()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear the back buffer every frame, to avoid leftover visuals
 
-		float currentFrame = glfwGetTime();
+		float currentFrame = (float)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		
-		model = glm::rotate(model, 0.016f, glm::vec3(0, 1, 0));	//Rotate the model
+		//model = glm::rotate(model, 0.016f, glm::vec3(0, 1, 0));	//Rotate the model
 
 		//CAMERA MOVEMENT
 		pCamera->Update(deltaTime);
@@ -224,6 +225,36 @@ int main()
 
 		//Draw the meshes
 		pCube->Draw();
+		pCube2->Draw();
+
+		bool inputFlag = false;
+		glm::vec3 displacement = glm::vec3(0);
+		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		{
+			displacement -= glm::vec3(0.0f, 0.0f, 1.0f);
+			inputFlag = true;
+		}
+		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		{
+			displacement += glm::vec3(0.0f, 0.0f, 1.0f);
+			inputFlag = true;
+		}
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		{
+			displacement -= glm::vec3(1.0f, 0.0f, 0.0f);
+			inputFlag = true;
+		}
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		{
+			displacement += glm::vec3(1.0f, 0.0f, 0.0f);
+			inputFlag = true;
+		}
+
+		if (inputFlag)
+		{
+			pCube->SetPosition((pCube->GetPosition()) + displacement * 2.0f * deltaTime);
+			glm::vec3 pos = pCube->GetPosition();
+		}
 
 
 		glfwSwapBuffers(window);	//Update the monitor display, swapping with the rendered back buffer
@@ -234,6 +265,7 @@ int main()
 	//Clearing memory
 	delete pCamera;
 	delete pCube;
+	delete pCube2;
 
 	glfwDestroyWindow(window);
 	glfwTerminate();	//Terminate GLFW
