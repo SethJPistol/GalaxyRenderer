@@ -10,7 +10,7 @@ public:
 	enum DrawMode
 	{
 		eCube,
-		eCircle,
+		ePolygon,
 		eCylinder
 	};
 
@@ -18,7 +18,7 @@ public:
 	~Shape();
 
 	void MakeCube();
-	void MakeCircle();
+	void MakePolygon();
 	void MakeCylinder();
 
 	void Draw();
@@ -47,5 +47,5 @@ private:
 	glm::vec3* m_vertexOffsets = nullptr;
 	float m_scale = 1.0f;
 
-	int m_slices;
+	int m_sides;
 };
