@@ -1,4 +1,5 @@
 #include "Shape.h"
+#include "ext.hpp"
 
 Shape::Shape(Shape::DrawMode shape)
 {
@@ -6,6 +7,14 @@ Shape::Shape(Shape::DrawMode shape)
 	{
 	case eCube:
 		MakeCube();
+		break;
+
+	case eCircle:
+		MakeCircle();
+		break;
+
+	case eCylinder:
+		MakeCylinder();
 		break;
 
 	default:
@@ -49,6 +58,7 @@ Shape::~Shape()
 void Shape::MakeCube()
 {
 	m_vertexAmount = 8;
+	//Set the vertex offsets
 	m_vertexOffsets = new glm::vec3[m_vertexAmount];
 	m_vertexOffsets[0] = glm::vec3(-0.5f, 0.5f, 0.5f);
 	m_vertexOffsets[1] = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -58,6 +68,8 @@ void Shape::MakeCube()
 	m_vertexOffsets[5] = glm::vec3(-0.5f, 0.5f, -0.5f);
 	m_vertexOffsets[6] = glm::vec3(0.5f, -0.5f, -0.5f);
 	m_vertexOffsets[7] = glm::vec3(-0.5f, -0.5f, -0.5f);
+
+	//Set the vertex positions (same as offsets if at 0,0,0)
 	m_vertices = new glm::vec3[m_vertexAmount];
 	memcpy(m_vertices, m_vertexOffsets, sizeof(glm::vec3) * m_vertexAmount);
 	//{
@@ -74,7 +86,9 @@ void Shape::MakeCube()
 	//	glm::vec3(-0.5f, -0.5f, -0.5f)
 	//};
 
-	m_indexBuffer = new int[36]
+	m_indexAmount = 36;
+	//Create the tris
+	m_indexBuffer = new int[m_indexAmount]
 	{
 		0, 2, 1, 1, 2, 3,	//Front face
 		4, 6, 5, 5, 6, 7, 	//Back face
@@ -83,7 +97,64 @@ void Shape::MakeCube()
 		5, 0, 4, 4, 0, 1,	//Top face
 		3, 2, 6, 2, 7, 6	//Bottom face
 	};	//Winding order
-	m_indexAmount = 36;
+}
+
+void Shape::MakeCircle()
+{
+	m_slices = 5;
+	m_vertexAmount = m_slices + 1;
+	//Set the vertex offsets
+	m_vertexOffsets = new glm::vec3[m_vertexAmount];
+	m_vertexOffsets[0] = glm::vec3(0);
+	for (int i = 1; i < m_vertexAmount; ++i)
+	{
+		m_vertexOffsets[i] = glm::vec3(glm::cos(glm::two_pi<float>() * ((float)(i - 1) / (float)m_slices)), 0, glm::sin(glm::two_pi<float>() * ((float)(i - 1) / (float)m_slices)));
+	}
+
+	//Set the vertex positions (same as offsets if at 0,0,0)
+	m_vertices = new glm::vec3[m_vertexAmount];
+	memcpy(m_vertices, m_vertexOffsets, sizeof(glm::vec3) * m_vertexAmount);
+
+	m_indexAmount = 3 * m_slices;
+	//Create the tris
+	m_indexBuffer = new int[m_indexAmount];
+	for (int i = 0; i < m_indexAmount; ++i)
+	{
+		m_indexBuffer[i] = 0;
+		++i;
+		m_indexBuffer[i] = i % 3 + (i * 0.333f);
+		++i;
+		m_indexBuffer[i] = i % 3 + (i * 0.333f);
+	}
+
+	//0, 1, 2
+	//0, 2, 3
+	//0, 3, 4
+}
+
+void Shape::MakeCylinder()
+{
+	m_slices = 3;
+	m_vertexAmount = 2 * m_slices;
+	//Set the vertex offsets
+	m_vertexOffsets = new glm::vec3[m_vertexAmount];
+	for (int i = 0; i < m_vertexAmount; ++i)
+	{
+		m_vertexOffsets[i] = glm::vec3(glm::cos(glm::two_pi<float>() * ((float)i / (float)m_slices)), -0.5f, glm::sin(glm::two_pi<float>() * ((float)i / (float)m_slices)));
+		++i;
+		m_vertexOffsets[i] = glm::vec3(glm::cos(glm::two_pi<float>() * ((float)i / (float)m_slices)), 0.5f, glm::sin(glm::two_pi<float>() * ((float)i / (float)m_slices)));
+	}
+
+	//Set the vertex positions (same as offsets if at 0,0,0)
+	m_vertices = new glm::vec3[m_vertexAmount];
+	memcpy(m_vertices, m_vertexOffsets, sizeof(glm::vec3) * m_vertexAmount);
+
+	m_indexAmount = 3;
+	//Create the tris
+	m_indexBuffer = new int[m_indexAmount]
+	{
+		0, 1, 2
+	};
 }
 
 void Shape::Draw()
@@ -126,7 +197,13 @@ float Shape::GetScale()
 
 void Shape::SetScale(float scale)
 {
+	for (int i = 0; i < m_vertexAmount; ++i)	//For all the vertices' offsets,
+	{
+		m_vertexOffsets[i] /= m_scale;	//Reset their scale to default
+		m_vertexOffsets[i] *= scale;	//Set the new scale
+	}
 	m_scale = scale;
+	SetPosition((glm::vec3)m_localTransform[3]);	//Apply the scale to the vertices
 }
 
 unsigned int Shape::GetVAO()

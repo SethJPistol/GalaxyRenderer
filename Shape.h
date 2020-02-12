@@ -10,13 +10,16 @@ public:
 	enum DrawMode
 	{
 		eCube,
-
+		eCircle,
+		eCylinder
 	};
 
 	Shape(Shape::DrawMode shape);
 	~Shape();
 
 	void MakeCube();
+	void MakeCircle();
+	void MakeCylinder();
 
 	void Draw();
 
@@ -43,4 +46,6 @@ private:
 	glm::mat4 m_localTransform;
 	glm::vec3* m_vertexOffsets = nullptr;
 	float m_scale = 1.0f;
+
+	int m_slices;
 };

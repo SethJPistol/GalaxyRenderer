@@ -98,9 +98,10 @@ int main()
 	//MAKE MESHES
 	Shape* pCube = new Shape(Shape::DrawMode::eCube);
 	Shape* pCube2 = new Shape(Shape::DrawMode::eCube);
-	pCube2->SetPosition(glm::vec3(-1.2f, 0.0f, 0.0f));
-	//Cube* pCube = new Cube();
-
+	Shape* pCircle = new Shape(Shape::DrawMode::eCircle);
+	pCube->SetScale(2.0f);
+	pCube->SetPosition(glm::vec3(-2.2f, 0.0f, 0.0f));
+	pCube2->SetPosition(glm::vec3(-4.2f, 0.0f, 0.0f));
 
 	//CAMERA
 	glm::mat4 model = glm::mat4(1);
@@ -226,6 +227,7 @@ int main()
 		//Draw the meshes
 		pCube->Draw();
 		pCube2->Draw();
+		pCircle->Draw();
 
 		bool inputFlag = false;
 		glm::vec3 displacement = glm::vec3(0);
@@ -266,6 +268,7 @@ int main()
 	delete pCamera;
 	delete pCube;
 	delete pCube2;
+	delete pCircle;
 
 	glfwDestroyWindow(window);
 	glfwTerminate();	//Terminate GLFW
