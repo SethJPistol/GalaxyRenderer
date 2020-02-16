@@ -220,17 +220,17 @@ int main()
 		//Set the transforms, must be done before drawing the arrays
 		auto uniform_location = glGetUniformLocation(shaderProgramID, "projection_view_matrix");
 		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pv));
-		uniform_location = glGetUniformLocation(shaderProgramID, "model_matrix");
-		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(model));
+		/*uniform_location = glGetUniformLocation(shaderProgramID, "model_matrix");
+		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(model));*/
 		uniform_location = glGetUniformLocation(shaderProgramID, "color");
 		glUniform4fv(uniform_location, 1, glm::value_ptr(color));
 
 
 		//Draw the meshes
-		pCube->Draw();
-		pCube2->Draw();
-		pPolygon->Draw();
-		pCylinder->Draw();
+		pCube->Draw(shaderProgramID);
+		pCube2->Draw(shaderProgramID);
+		pPolygon->Draw(shaderProgramID);
+		pCylinder->Draw(shaderProgramID);
 
 		bool inputFlag = false;
 		glm::vec3 displacement = glm::vec3(0);

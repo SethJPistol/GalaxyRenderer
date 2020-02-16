@@ -184,8 +184,11 @@ void Shape::MakeCylinder()
 	m_indexBuffer[m_indexAmount - 1] = (m_indexAmount * 0.5f) + 1;
 }
 
-void Shape::Draw()
+void Shape::Draw(unsigned int shaderProgramID)
 {
+	auto uniform_location = glGetUniformLocation(shaderProgramID, "model_matrix");
+	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m_localTransform));
+
 	//Binding and drawing arrays
 	glBindVertexArray(m_VAO);
 	glDrawElements(GL_TRIANGLES, m_indexAmount, GL_UNSIGNED_INT, 0);	//Used for drawing using the IBO
@@ -198,23 +201,23 @@ glm::vec3 Shape::GetPosition()
 
 void Shape::SetPosition(glm::vec3 pos)
 {
-	for (int i = 0; i < m_vertexAmount; ++i)
-	{
-		m_vertices[i] = pos + m_vertexOffsets[i];
-	}
+	//for (int i = 0; i < m_vertexAmount; ++i)
+	//{
+	//	m_vertices[i] = pos + m_vertexOffsets[i];
+	//}
 
-	glBindVertexArray(m_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexAmount * sizeof(glm::vec3), &m_vertices[0], GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexAmount * sizeof(int), m_indexBuffer, GL_STATIC_DRAW);
+	//glBindVertexArray(m_VAO);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
+	//glBufferData(GL_ARRAY_BUFFER, m_vertexAmount * sizeof(glm::vec3), &m_vertices[0], GL_STATIC_DRAW);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexAmount * sizeof(int), m_indexBuffer, GL_STATIC_DRAW);
 
-	//Unbind the array and buffers
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	////Unbind the array and buffers
+	//glBindVertexArray(0);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	m_localTransform[3] = glm::vec4(pos, 0.0f);
+	m_localTransform[3] = glm::vec4(pos, 1.0f);
 }
 
 float Shape::GetScale()

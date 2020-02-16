@@ -21,7 +21,7 @@ public:
 	void MakePolygon();
 	void MakeCylinder();
 
-	void Draw();
+	void Draw(unsigned int shaderProgramID);
 
 	glm::vec3 GetPosition();
 	void SetPosition(glm::vec3 pos);
