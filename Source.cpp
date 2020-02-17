@@ -7,11 +7,10 @@
 #include <sstream>
 
 #include "Camera.h"
-#include "Cube.h"
 #include "Shape.h"
+#include "Dependencies\OBJMesh.h"
 
 #define COLOR_SPEED 0.025f
-#define CAMERA_SPEED 0.03f
 
 
 void ShaderCompileCheck(unsigned int shaderID, const char* errorMessage)
@@ -96,14 +95,13 @@ int main()
 
 
 	//MAKE MESHES
-	Shape* pCube = new Shape(Shape::DrawMode::eCube);
-	Shape* pCube2 = new Shape(Shape::DrawMode::eCube);
-	Shape* pPolygon = new Shape(Shape::DrawMode::ePolygon);
-	Shape* pCylinder = new Shape(Shape::DrawMode::eCylinder);
-	pCube->SetScale(2.0f);
-	pCube->SetPosition(glm::vec3(-3.2f, 0.0f, 0.0f));
-	pCube2->SetPosition(glm::vec3(-6.2f, 0.0f, 0.0f));
-	pPolygon->SetPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+	gal::Cube* pCube = new gal::Cube();
+	gal::Cube* pCube2 = new gal::Cube(glm::vec3(-3.0f, 0.0f, 0.0f), 2.0f);
+	gal::Polygon* pPoly = new gal::Polygon(7, glm::vec3(3.0f, 0.0f, 0.0f));
+	gal::Prism* pPrism = new gal::Prism(3, 2.0f, glm::vec3(5.0f, 0.0f, 0.0f));
+	aie::OBJMesh soldierModel;
+	bool loaded = soldierModel.load("Assets\\WinterSoldier\\Model\\ASOBJ.obj", false);
+	
 
 	//CAMERA
 	glm::mat4 model = glm::mat4(1);
@@ -135,7 +133,7 @@ int main()
 	glCompileShader(vertexShaderID);	//Build the shader
 
 	//Check it worked
-	ShaderCompileCheck(vertexShaderID, "VERTEX SHADER FAILED TO COMPILE");
+	ShaderCompileCheck(vertexShaderID, "Vertex shader failed to compile");
 
 
 	//FRAGMENT SHADER
@@ -157,7 +155,7 @@ int main()
 	glCompileShader(fragmentShaderID);	//Build the shader
 
 	//Check it worked
-	ShaderCompileCheck(fragmentShaderID, "FRAGMENT SHADER FAILED TO COMPILE");
+	ShaderCompileCheck(fragmentShaderID, "Fragment shader failed to compile");
 
 	//SHADER PROGRAM
 	//Now the IDs are validated, they can be linked
@@ -167,7 +165,7 @@ int main()
 	glLinkProgram(shaderProgramID);	//Link the two programs
 
 	//Check it worked
-	ShaderProgramLinkCheck(shaderProgramID, "SHADER PROGRAM FAILED TO LINK");
+	ShaderProgramLinkCheck(shaderProgramID, "Shader program failed to link");
 
 
 	//COLOR
@@ -178,6 +176,7 @@ int main()
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);	//Set the colour to clear the screen to
 	glPolygonMode(GL_BACK, GL_LINE);	//Set to render in wireframe mode
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);	//Set to render in wireframe mode
 
 
 	//DELTATIME
@@ -227,10 +226,11 @@ int main()
 
 
 		//Draw the meshes
-		pCube->Draw(shaderProgramID);
-		pCube2->Draw(shaderProgramID);
-		pPolygon->Draw(shaderProgramID);
-		pCylinder->Draw(shaderProgramID);
+		pCube->Draw();
+		pCube2->Draw();
+		pPoly->Draw();
+		pPrism->Draw();
+		soldierModel.draw();
 
 		bool inputFlag = false;
 		glm::vec3 displacement = glm::vec3(0);
@@ -271,8 +271,8 @@ int main()
 	delete pCamera;
 	delete pCube;
 	delete pCube2;
-	delete pPolygon;
-	delete pCylinder;
+	delete pPoly;
+	delete pPrism;
 
 	glfwDestroyWindow(window);
 	glfwTerminate();	//Terminate GLFW

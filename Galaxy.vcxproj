@@ -151,8 +151,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="Dependencies\glcore\gl_core_4_5.c" />
+    <ClCompile Include="Dependencies\OBJMesh.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="Source.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%SolutionDir/Dependencies</AdditionalIncludeDirectories>
@@ -160,7 +160,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Cube.h" />
+    <ClInclude Include="Dependencies\OBJMesh.h" />
+    <ClInclude Include="Dependencies\tiny_obj_loader.h" />
     <ClInclude Include="Shape.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
