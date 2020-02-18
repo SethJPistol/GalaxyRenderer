@@ -95,12 +95,18 @@ int main()
 
 
 	//MAKE MESHES
-	gal::Cube* pCube = new gal::Cube();
-	gal::Cube* pCube2 = new gal::Cube(glm::vec3(-3.0f, 0.0f, 0.0f), 2.0f);
-	gal::Polygon* pPoly = new gal::Polygon(7, glm::vec3(3.0f, 0.0f, 0.0f));
-	gal::Prism* pPrism = new gal::Prism(3, 2.0f, glm::vec3(5.0f, 0.0f, 0.0f));
-	aie::OBJMesh soldierModel;
-	bool loaded = soldierModel.load("Assets\\WinterSoldier\\Model\\ASOBJ.obj", false);
+	glxy::Quad* pQuad = new glxy::Quad();
+	glxy::Cube* pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
+	//glxy::Cube* pCube2 = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f), 2.0f);
+	//glxy::Polygon* pPoly = new glxy::Polygon(7, glm::vec3(3.0f, 0.0f, 0.0f));
+	//glxy::Prism* pPrism = new glxy::Prism(3, 2.0f, glm::vec3(5.0f, 0.0f, 0.0f));
+	//glxy::Pyramid* pPyramid = new glxy::Pyramid();
+	//aie::OBJMesh soldierModel;
+	//bool loaded = soldierModel.load("Assets\\WinterSoldier\\Model\\ASOBJ.obj", false);
+
+
+	//TEXTURE
+	pQuad->LoadTexture("Assets/test.png");
 	
 
 	//CAMERA
@@ -174,7 +180,7 @@ int main()
 	float g = COLOR_SPEED;
 	float b = COLOR_SPEED;
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);	//Set the colour to clear the screen to
+	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);	//Set the colour to clear the screen to
 	glPolygonMode(GL_BACK, GL_LINE);	//Set to render in wireframe mode
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);	//Set to render in wireframe mode
 
@@ -212,25 +218,28 @@ int main()
 			colorDirection = -colorDirection;
 			r = b = g += (COLOR_SPEED * colorDirection);
 		}
-		glm::vec4 color = glm::vec4(r, g, b, 0.0f);
+		//glm::vec4 color = glm::vec4(r, g, b, 0.0f);
+		glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 0.0f);
 
 		//Use the shaders
 		glUseProgram(shaderProgramID);	//Use the shader program, now it is bound
 		//Set the transforms, must be done before drawing the arrays
 		auto uniform_location = glGetUniformLocation(shaderProgramID, "projection_view_matrix");
 		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pv));
-		/*uniform_location = glGetUniformLocation(shaderProgramID, "model_matrix");
-		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(model));*/
-		uniform_location = glGetUniformLocation(shaderProgramID, "color");
-		glUniform4fv(uniform_location, 1, glm::value_ptr(color));
+		uniform_location = glGetUniformLocation(shaderProgramID, "model_matrix");
+		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(model));
+		//uniform_location = glGetUniformLocation(shaderProgramID, "color");
+		//glUniform4fv(uniform_location, 1, glm::value_ptr(color));
 
 
 		//Draw the meshes
+		pQuad->Draw();
 		pCube->Draw();
-		pCube2->Draw();
-		pPoly->Draw();
-		pPrism->Draw();
-		soldierModel.draw();
+		//pCube2->Draw();
+		//pPoly->Draw();
+		//pPrism->Draw();
+		//pPyramid->Draw();
+		//soldierModel.draw();
 
 		bool inputFlag = false;
 		glm::vec3 displacement = glm::vec3(0);
@@ -257,8 +266,8 @@ int main()
 
 		if (inputFlag)
 		{
-			pCube->SetPosition((pCube->GetPosition()) + displacement * 2.0f * deltaTime);
-			glm::vec3 pos = pCube->GetPosition();
+			//pCube->SetPosition((pCube->GetPosition()) + displacement * 2.0f * deltaTime);
+			//glm::vec3 pos = pCube->GetPosition();
 		}
 
 
@@ -269,10 +278,12 @@ int main()
 
 	//Clearing memory
 	delete pCamera;
+	delete pQuad;
 	delete pCube;
-	delete pCube2;
-	delete pPoly;
-	delete pPrism;
+	//delete pCube2;
+	//delete pPoly;
+	//delete pPrism;
+	//delete pPyramid;
 
 	glfwDestroyWindow(window);
 	glfwTerminate();	//Terminate GLFW

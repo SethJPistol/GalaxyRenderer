@@ -1,7 +1,10 @@
 #include "Shape.h"
 #include "ext.hpp"
 
-using namespace gal;
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"	//For textures
+
+using namespace glxy;
 
 Shape::Shape(glm::vec3 position, float scale)
 {
@@ -73,19 +76,26 @@ unsigned int Shape::GetVAO()
 
 void Shape::LoadMesh()
 {
-	//Create and load the mesh
+	//Generate the buffers
 	glGenVertexArrays(1, &m_VAO);
 	glGenBuffers(1, &m_VBO);
 	glGenBuffers(1, &m_IBO);
 
+	//Bind vertex array
 	glBindVertexArray(m_VAO);
+	//Bind buffers
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexAmount * sizeof(glm::vec3), &m_vertices[0], GL_STATIC_DRAW);
+
+	//Fill buffers
+	glBufferData(GL_ARRAY_BUFFER, m_vertexAmount * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexAmount * sizeof(int), m_indexBuffer, GL_STATIC_DRAW);
 
+	//Set the attributes of each vertex
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(glm::vec3));
 
 	//Unbind the array and buffers for safety
 	glBindVertexArray(0);
@@ -96,25 +106,82 @@ void Shape::LoadMesh()
 
 
 
+Quad::Quad(glm::vec3 position, float scale) : Shape(position, scale)
+{
+	CreateMesh();
+	LoadMesh();
+}
+Quad::~Quad()
+{
+	glDeleteTextures(1, &m_texture);
+}
+void Quad::LoadTexture(const char* texturePath)
+{
+	int x, y, n;
+	unsigned char* texData = stbi_load(texturePath, &x, &y, &n, 0);
+
+	glGenTextures(1, &m_texture);
+	glBindTexture(GL_TEXTURE_2D, m_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+
+	//Generate the mipmaps so the texture can be sampled
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // GL_LINEAR SAMPLES texels
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // GL_NEARESTS RETURNS just closest pixel
+
+	stbi_image_free(texData);
+}
+void Quad::Draw()
+{
+	if (m_texture != 0)
+		glBindTexture(GL_TEXTURE_2D, m_texture);
+	Shape::Draw();
+	if (m_texture != 0)
+		glBindTexture(GL_TEXTURE_2D, 0);	//Unbind the texture so that other things aren't rendered with it
+}
+void Quad::CreateMesh()
+{
+	m_vertexAmount = 4;
+	m_vertices = new Vertex[m_vertexAmount];
+
+	//Set the vertex positions
+	m_vertices[0].position = glm::vec3(-0.5f, 0.5f, 0.0f);
+	m_vertices[1].position = glm::vec3(0.5f, 0.5f, 0.0f);
+	m_vertices[2].position = glm::vec3(-0.5f, -0.5f, 0.0f);
+	m_vertices[3].position = glm::vec3(0.5f, -0.5f, 0.0f);
+
+	//Set the vertex UVs
+	m_vertices[0].UV = glm::vec2(0.0f, 0.0f);
+	m_vertices[1].UV = glm::vec2(1.0f, 0.0f);
+	m_vertices[2].UV = glm::vec2(0.0f, 1.0f);
+	m_vertices[3].UV = glm::vec2(1.0f, 1.0f);
+
+	//Create the tris
+	m_indexAmount = 6;
+	m_indexBuffer = new int[m_indexAmount]
+	{
+		0, 2, 1, 1, 2, 3
+	};
+}
+
+
 Cube::Cube(glm::vec3 position, float scale) : Shape(position, scale)
 {
 	CreateMesh();
 	LoadMesh();
 }
-
 void Cube::CreateMesh()
 {
 	m_vertexAmount = 8;
 	//Set the vertex positions
-	m_vertices = new glm::vec3[m_vertexAmount];
-	m_vertices[0] = glm::vec3(-0.5f, 0.5f, 0.5f);
-	m_vertices[1] = glm::vec3(0.5f, 0.5f, 0.5f);
-	m_vertices[2] = glm::vec3(-0.5f, -0.5f, 0.5f);
-	m_vertices[3] = glm::vec3(0.5f, -0.5f, 0.5f);
-	m_vertices[4] = glm::vec3(0.5f, 0.5f, -0.5f);
-	m_vertices[5] = glm::vec3(-0.5f, 0.5f, -0.5f);
-	m_vertices[6] = glm::vec3(0.5f, -0.5f, -0.5f);
-	m_vertices[7] = glm::vec3(-0.5f, -0.5f, -0.5f);
+	m_vertices = new Vertex[m_vertexAmount];
+	m_vertices[0].position = glm::vec3(-0.5f, 0.5f, 0.5f);
+	m_vertices[1].position = glm::vec3(0.5f, 0.5f, 0.5f);
+	m_vertices[2].position = glm::vec3(-0.5f, -0.5f, 0.5f);
+	m_vertices[3].position = glm::vec3(0.5f, -0.5f, 0.5f);
+	m_vertices[4].position = glm::vec3(0.5f, 0.5f, -0.5f);
+	m_vertices[5].position = glm::vec3(-0.5f, 0.5f, -0.5f);
+	m_vertices[6].position = glm::vec3(0.5f, -0.5f, -0.5f);
+	m_vertices[7].position = glm::vec3(-0.5f, -0.5f, -0.5f);
 
 	//Create the tris
 	m_indexAmount = 36;
@@ -130,8 +197,6 @@ void Cube::CreateMesh()
 }
 
 
-
-
 Polygon::Polygon(int sides, glm::vec3 position, float scale) : Shape(position, scale)
 {
 	m_sides = sides;
@@ -140,17 +205,16 @@ Polygon::Polygon(int sides, glm::vec3 position, float scale) : Shape(position, s
 	CreateMesh();
 	LoadMesh();
 }
-
 void Polygon::CreateMesh()
 {
 	m_vertexAmount = m_sides + 1;	//All verts on the outside and the centre vert
 	//Set the vertex positions
-	m_vertices = new glm::vec3[m_vertexAmount];
-	m_vertices[0] = glm::vec3(0);	//Make the centre
+	m_vertices = new Vertex[m_vertexAmount];
+	m_vertices[0].position = glm::vec3(0);	//Make the centre
 	for (int i = 1; i < m_vertexAmount; ++i)
 	{
 		float currentAngle = glm::two_pi<float>() * ((float)(i - 1) / (float)m_sides);
-		m_vertices[i] = glm::vec3(glm::cos(currentAngle), 0, -glm::sin(currentAngle));	//Sin negative to make face-up
+		m_vertices[i].position = glm::vec3(glm::cos(currentAngle), 0, -glm::sin(currentAngle));	//Sin negative to make face-up
 	}
 
 	//Create the tris
@@ -168,8 +232,6 @@ void Polygon::CreateMesh()
 }
 
 
-
-
 Prism::Prism(int sides, float height, glm::vec3 position, float scale) : Shape(position, scale)
 {
 	m_sides = sides;
@@ -179,27 +241,26 @@ Prism::Prism(int sides, float height, glm::vec3 position, float scale) : Shape(p
 	CreateMesh();
 	LoadMesh();
 }
-
 void Prism::CreateMesh()
 {
 	m_vertexAmount = 2 * (m_sides + 1);	//Cylinder verts is same as two polygons
 	//Set the vertex positions
-	m_vertices = new glm::vec3[m_vertexAmount];
+	m_vertices = new Vertex[m_vertexAmount];
 
 	//Make the bottom polygon
 	float heightOffset = m_height / 2;
-	m_vertices[0] = glm::vec3(0.0f, -heightOffset, 0.0f);
+	m_vertices[0].position = glm::vec3(0.0f, -heightOffset, 0.0f);
 	for (int i = 1; i < (m_vertexAmount * 0.5f); ++i)
 	{
 		float currentAngle = glm::two_pi<float>() * ((float)(i - 1) / (float)m_sides);
-		m_vertices[i] = glm::vec3(glm::cos(currentAngle), -heightOffset, glm::sin(currentAngle));
+		m_vertices[i].position = glm::vec3(glm::cos(currentAngle), -heightOffset, glm::sin(currentAngle));
 	}
 	//Make the top polygon
-	m_vertices[(int)(m_vertexAmount * 0.5f)] = glm::vec3(0.0f, heightOffset, 0.0f);
+	m_vertices[(int)(m_vertexAmount * 0.5f)].position = glm::vec3(0.0f, heightOffset, 0.0f);
 	for (int i = 1; i < (m_vertexAmount * 0.5f); ++i)
 	{
 		float currentAngle = glm::two_pi<float>() * ((float)(i - 1) / (float)m_sides);
-		m_vertices[i + (int)(m_vertexAmount * 0.5f)] = glm::vec3(glm::cos(currentAngle), heightOffset, glm::sin(currentAngle));
+		m_vertices[i + (int)(m_vertexAmount * 0.5f)].position = glm::vec3(glm::cos(currentAngle), heightOffset, glm::sin(currentAngle));
 	}
 
 
@@ -258,4 +319,63 @@ void Prism::CreateMesh()
 	m_indexBuffer[m_indexAmount - 6] = 1;
 	m_indexBuffer[m_indexAmount - 2] = sidesOffset + 1;
 	m_indexBuffer[m_indexAmount - 1] = 1;
+}
+
+
+Pyramid::Pyramid(int sides, float height, glm::vec3 position, float scale) : Shape(position, scale)
+{
+	m_sides = sides;
+	if (m_sides < 3)
+		m_sides = 3;
+	m_height = height;
+	CreateMesh();
+	LoadMesh();
+}
+void Pyramid::CreateMesh()
+{
+	m_vertexAmount = m_sides + 2;	//Cylinder verts is same as two polygons
+	//Set the vertex positions
+	m_vertices = new Vertex[m_vertexAmount];
+
+	//Make the bottom polygon
+	float heightOffset = m_height / 2;
+	m_vertices[0].position = glm::vec3(0.0f, -heightOffset, 0.0f);	//Centre of the base
+	for (int i = 1; i < (m_vertexAmount - 1); ++i)
+	{
+		float currentAngle = glm::two_pi<float>() * ((float)(i - 1) / (float)m_sides);
+		m_vertices[i].position = glm::vec3(glm::cos(currentAngle), -heightOffset, glm::sin(currentAngle));
+	}
+	m_vertices[m_vertexAmount - 1].position = glm::vec3(0.0f, heightOffset, 0.0f);	//Top of the cone
+
+
+	//Create the tris
+	m_indexAmount = 6 * m_sides;
+	m_indexBuffer = new int[m_indexAmount];
+
+	//Index the bottom polygon
+	int currentTri = 1;
+	for (int i = 0; i < (m_sides * 3); ++i)
+	{
+		m_indexBuffer[i] = 0;
+		++i;
+		m_indexBuffer[i] = currentTri;
+		++i;
+		m_indexBuffer[i] = currentTri + 1;
+		++currentTri;
+	}
+	m_indexBuffer[(int)(m_sides * 3) - 1] = 1;	//Link the final index along the circle back to the first
+
+	//Index the top polygon
+	int startingIndex = (int)(m_sides * 3);				//Offset the indexes we are writing
+	currentTri = 1;
+	for (int i = 0; i < (m_sides * 6); ++i)
+	{
+		m_indexBuffer[i + startingIndex] = (m_vertexAmount - 1);
+		++i;
+		m_indexBuffer[i + startingIndex] = currentTri + 1;
+		++i;
+		m_indexBuffer[i + startingIndex] = currentTri;
+		++currentTri;
+	}
+	m_indexBuffer[(m_sides * 6) - 2] = 1;	//Link the final index along the circle back to the first
 }
