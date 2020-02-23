@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Dependencies\glcore\gl_core_4_5.c" />
     <ClCompile Include="Dependencies\OBJMesh.cpp" />
@@ -159,6 +160,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Dependencies\OBJMesh.h" />
     <ClInclude Include="Dependencies\tiny_obj_loader.h" />
