@@ -6,6 +6,7 @@
 
 #include "Camera.h"
 #include "Shape.h"
+#include "ShaderManager.h"
 #include "Dependencies\OBJMesh.h"
 
 class Application
@@ -17,21 +18,17 @@ public:
 
 	void Run();
 
+	ShaderManager* pShaderMan = nullptr;
+
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 
 private:
 
 	int InitialiseOGL();
-	void ShaderCompileCheck(unsigned int shaderID, const char* errorMessage);
-	void ShaderProgramLinkCheck(unsigned int programID, const char* errorMessage);
 
 	bool m_running;
 	GLFWwindow* m_window;
-
-	unsigned int m_vertexShaderID;
-	unsigned int m_fragmentShaderID;
-	unsigned int m_shaderProgramID;
 
 	glm::mat4 m_model;
 	Camera* m_pCamera;

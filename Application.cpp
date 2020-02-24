@@ -18,10 +18,6 @@ Application::Application()
 	//MAKE MESHES
 	m_pQuad = new glxy::Quad();
 	m_pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
-	//glxy::Cube* pCube2 = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f), 2.0f);
-	//glxy::Polygon* pPoly = new glxy::Polygon(7, glm::vec3(3.0f, 0.0f, 0.0f));
-	//glxy::Prism* pPrism = new glxy::Prism(3, 2.0f, glm::vec3(5.0f, 0.0f, 0.0f));
-	//glxy::Pyramid* pPyramid = new glxy::Pyramid();
 	//aie::OBJMesh soldierModel;
 	//bool loaded = soldierModel.load("Assets\\WinterSoldier\\Model\\ASOBJ.obj", false);
 
@@ -36,73 +32,14 @@ Application::Application()
 
 
 	//SHADERS
-	m_vertexShaderID = 0;
-	m_fragmentShaderID = 0;
-	m_shaderProgramID = 0;
-
-	//VERTEX SHADER
-	//Load shader into string
-	std::string shaderData;
-	std::ifstream inFileStream("Shaders\\simple_vertex_shader.glsl", std::ifstream::in);
-
-	//Load source into string for compilation
-	std::stringstream stringStream;
-	if (inFileStream.is_open())
-	{
-		stringStream << inFileStream.rdbuf();
-		shaderData = stringStream.str();
-		inFileStream.close();
-	}
-
-	m_vertexShaderID = glCreateShader(GL_VERTEX_SHADER);	//Allocate space for a vertex shader
-	const char* data = shaderData.c_str();	//Convert to raw c string
-	glShaderSource(m_vertexShaderID, 1, (const GLchar**)&data, 0);	//Send it to the shader location
-	glCompileShader(m_vertexShaderID);	//Build the shader
-
-	//Check it worked
-	ShaderCompileCheck(m_vertexShaderID, "Vertex shader failed to compile");
+	pShaderMan = new ShaderManager("Shaders\\simple_vertex_shader.glsl", "Shaders\\simple_fragment_shader.glsl");
 
 
-	//FRAGMENT SHADER
-	//Load shader into string
-	std::ifstream inFileStreamFrag("Shaders\\simple_fragment_shader.glsl", std::ifstream::in);
-
-	//Load source into string for compilation
-	std::stringstream stringStream_frag;
-	if (inFileStreamFrag.is_open())
-	{
-		stringStream_frag << inFileStreamFrag.rdbuf();
-		shaderData = stringStream_frag.str();
-		inFileStreamFrag.close();
-	}
-
-	m_fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);	//Allocate space for a vertex shader
-	data = shaderData.c_str();	//Convert to raw c string
-	glShaderSource(m_fragmentShaderID, 1, (const GLchar**)&data, 0);	//Send it to the shader location
-	glCompileShader(m_fragmentShaderID);	//Build the shader
-
-	//Check it worked
-	ShaderCompileCheck(m_fragmentShaderID, "Fragment shader failed to compile");
-
-	//SHADER PROGRAM
-	//Now the IDs are validated, they can be linked
-	m_shaderProgramID = glCreateProgram();	//Create the new shader program
-	glAttachShader(m_shaderProgramID, m_vertexShaderID);	//Attach shader by ID and type
-	glAttachShader(m_shaderProgramID, m_fragmentShaderID);	//Attach shader by ID and type
-	glLinkProgram(m_shaderProgramID);	//Link the two programs
-
-	//Check it worked
-	ShaderProgramLinkCheck(m_shaderProgramID, "Shader program failed to link");
-
-
-	//COLOR
-	/*int colorDirection = 1;
-	float r = COLOR_SPEED;
-	float g = COLOR_SPEED;
-	float b = COLOR_SPEED;*/
-
+	//RENDER SETTINGS
 	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);	//Set the colour to clear the screen to
-	glPolygonMode(GL_BACK, GL_LINE);	//Set to render in wireframe mode
+	glPolygonMode(GL_BACK, GL_LINE);		//Set to render in wireframe mode
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);	//Set to render in wireframe mode
 
 	m_running = true;
@@ -110,13 +47,11 @@ Application::Application()
 
 Application::~Application()
 {
+	delete pShaderMan;
+
 	delete m_pCamera;
 	delete m_pQuad;
 	delete m_pCube;
-	//delete pCube2;
-	//delete pPoly;
-	//delete pPrism;
-	//delete pPyramid;
 
 	glfwDestroyWindow(m_window);
 	glfwTerminate();	//Terminate GLFW
@@ -136,35 +71,17 @@ void Application::Run()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		//model = glm::rotate(model, 0.016f, glm::vec3(0, 1, 0));	//Rotate the model
-
 		//CAMERA MOVEMENT
 		m_pCamera->Update(deltaTime);
 
 		glm::mat4 pv = m_pCamera->GetPV();
 
-		////Calculate color this frame
-		//if (r > 0.0f && r < 1.0f)
-		//	r += COLOR_SPEED * colorDirection;
-		//else if (b > 0.0f && b < 1.0f)
-		//	b += COLOR_SPEED * colorDirection;
-		//else if (g > 0.0f && g < 1.0f)
-		//	g += COLOR_SPEED * colorDirection;
-		//else
-		//{
-		//	colorDirection = -colorDirection;
-		//	r = b = g += (COLOR_SPEED * colorDirection);
-		//}
-		////glm::vec4 color = glm::vec4(r, g, b, 0.0f);
-		//glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 0.0f);
+		//SHADERS
+		pShaderMan->UseProgram();	//Bind the shaders
 
-		//Use the shaders
-		glUseProgram(m_shaderProgramID);	//Use the shader program, now it is bound
 		//Set the transforms, must be done before drawing the arrays
-		auto uniform_location = glGetUniformLocation(m_shaderProgramID, "projection_view_matrix");
-		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(pv));
-		uniform_location = glGetUniformLocation(m_shaderProgramID, "model_matrix");
-		glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m_model));
+		pShaderMan->SetUniform("projection_view_matrix", glm::value_ptr(pv));
+		pShaderMan->SetUniform("model_matrix", glm::value_ptr(m_model));
 		//uniform_location = glGetUniformLocation(m_shaderProgramID, "color");
 		//glUniform4fv(uniform_location, 1, glm::value_ptr(color));
 
@@ -172,10 +89,6 @@ void Application::Run()
 		//Draw the meshes
 		m_pQuad->Draw();
 		m_pCube->Draw();
-		//pCube2->Draw();
-		//pPoly->Draw();
-		//pPrism->Draw();
-		//pPyramid->Draw();
 		//soldierModel.draw();
 
 		bool inputFlag = false;
@@ -248,52 +161,4 @@ int Application::InitialiseOGL()
 	printf("GL Version: %i.%i\n", major, minor);
 
 	return 0;	//No error encountered
-}
-
-void Application::ShaderCompileCheck(unsigned int shaderID, const char* errorMessage)
-{
-	//Check it worked
-	GLint success = GL_FALSE;
-	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
-	if (success == GL_FALSE)
-	{
-		//Get the length of the OpenGL error message
-		GLint logLength = 0;
-		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logLength);
-		//Create the error buffer
-		char* log = new char[logLength];
-		//Copy the error from the buffer
-		glGetShaderInfoLog(shaderID, logLength, 0, log);
-
-		//Create the error message
-		std::string full_errorMessage(log);
-		full_errorMessage += errorMessage;
-		full_errorMessage += "\n";
-		printf(full_errorMessage.c_str());
-		//Clean up anyways
-		delete[] log;
-	}
-}
-void Application::ShaderProgramLinkCheck(unsigned int programID, const char* errorMessage)
-{
-	GLint success = GL_FALSE;
-	glGetProgramiv(programID, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		//Get the length of the OpenGL error message
-		GLint logLength = 0;
-		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &logLength);
-		//Create the error buffer
-		char* log = new char[logLength];
-		//Copy the error from the buffer
-		glGetProgramInfoLog(programID, logLength, 0, log);
-
-		//Create the error message
-		std::string full_errorMessage(log);
-		full_errorMessage += errorMessage;
-		full_errorMessage += "\n";
-		printf(full_errorMessage.c_str());
-		//Clean up anyways
-		delete[] log;
-	}
 }
