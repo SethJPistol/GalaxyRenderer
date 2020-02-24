@@ -3,10 +3,9 @@
 #include <fstream>	//For strings and other stuff
 #include <sstream>
 
-#define COLOR_SPEED 0.025f
-
 Application::Application()
 {
+	//WINDOW
 	m_window = nullptr;
 	int result = InitialiseOGL();
 	if (result != 0 || m_window == nullptr)		//If an error was encountered,
@@ -15,15 +14,14 @@ Application::Application()
 		return;
 	}
 
-	//MAKE MESHES
-	m_pQuad = new glxy::Quad();
+	//MESHES
+	m_pSprite = new glxy::Sprite();
 	m_pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
-	//aie::OBJMesh soldierModel;
-	//bool loaded = soldierModel.load("Assets\\WinterSoldier\\Model\\ASOBJ.obj", false);
+	bool loaded = m_pSoldierModel.load("Assets\\WinterSoldier\\Model\\ASOBJ.obj", false);
 
 
 	//TEXTURE
-	m_pQuad->LoadTexture("Assets/test.png");
+	m_pSprite->LoadTexture("Assets/test.png");
 
 
 	//CAMERA
@@ -32,25 +30,31 @@ Application::Application()
 
 
 	//SHADERS
-	pShaderMan = new ShaderManager("Shaders\\simple_vertex_shader.glsl", "Shaders\\simple_fragment_shader.glsl");
+	pShapeShader = new ShaderManager("Shaders\\VertexShaderBasic.glsl", "Shaders\\FragmentShaderBasic.glsl");
+	pSpriteShader = new ShaderManager("Shaders\\VertexShaderSprite.glsl", "Shaders\\FragmentShaderSprite.glsl");
+	pLitShader = new ShaderManager("Shaders\\VertexShaderLit.glsl", "Shaders\\FragmentShaderLit.glsl");
 
 
 	//RENDER SETTINGS
 	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);	//Set the colour to clear the screen to
-	glPolygonMode(GL_BACK, GL_LINE);		//Set to render in wireframe mode
+	glPolygonMode(GL_BACK, GL_LINE);		//Set to render back faces in wireframe mode
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);	//Set to render all faces in wireframe mode
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);	//Set to render in wireframe mode
+	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	m_running = true;
 }
 
 Application::~Application()
 {
-	delete pShaderMan;
+	delete pShapeShader;
+	delete pSpriteShader;
+	delete pLitShader;
 
 	delete m_pCamera;
-	delete m_pQuad;
+	delete m_pSprite;
 	delete m_pCube;
 
 	glfwDestroyWindow(m_window);
@@ -76,20 +80,31 @@ void Application::Run()
 
 		glm::mat4 pv = m_pCamera->GetPV();
 
-		//SHADERS
-		pShaderMan->UseProgram();	//Bind the shaders
+		glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-		//Set the transforms, must be done before drawing the arrays
-		pShaderMan->SetUniform("projection_view_matrix", glm::value_ptr(pv));
-		pShaderMan->SetUniform("model_matrix", glm::value_ptr(m_model));
-		//uniform_location = glGetUniformLocation(m_shaderProgramID, "color");
-		//glUniform4fv(uniform_location, 1, glm::value_ptr(color));
-
-
-		//Draw the meshes
-		m_pQuad->Draw();
+		//Shape drawing
+		pShapeShader->UseProgram();	//Bind the shaders
+		pShapeShader->SetUniform("projection_view_matrix", pv);
+		pShapeShader->SetUniform("model_matrix", m_model);
+		pShapeShader->SetUniform("color", color);
 		m_pCube->Draw();
-		//soldierModel.draw();
+
+
+		//Sprite drawing
+		pSpriteShader->UseProgram();	//Bind the shaders
+		pSpriteShader->SetUniform("projection_view_matrix", pv);
+		pSpriteShader->SetUniform("model_matrix", m_model);
+		m_pSprite->Draw();
+
+
+		//Object drawing
+		pLitShader->UseProgram();	//Bind the shaders
+		pLitShader->SetUniform("projection_view_matrix", pv);
+		pLitShader->SetUniform("model_matrix", m_model);
+		pLitShader->SetUniform("normal_matrix", glm::inverseTranspose(glm::mat3(m_model)));	//Probably should be done separately on object itself
+		pLitShader->SetUniform("directional_light", glm::vec3(-1.0f, 0.0f, 0.0f));
+		m_pSoldierModel.draw();
+
 
 		bool inputFlag = false;
 		glm::vec3 displacement = glm::vec3(0);

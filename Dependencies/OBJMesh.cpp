@@ -1,5 +1,6 @@
 #include "OBJMesh.h"
 #include "..\glcore\gl_core_4_5.h"
+#include "ext.hpp"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
@@ -157,36 +158,36 @@ void OBJMesh::draw(bool usePatches /* = false */) {
 	}
 
 	// pull uniforms from the shader
-	int kaUniform = glGetUniformLocation(program, "Ka");
-	int kdUniform = glGetUniformLocation(program, "Kd");
-	int ksUniform = glGetUniformLocation(program, "Ks");
-	int keUniform = glGetUniformLocation(program, "Ke");
-	int opacityUniform = glGetUniformLocation(program, "opacity");
-	int specPowUniform = glGetUniformLocation(program, "specularPower");
+	//int kaUniform = glGetUniformLocation(program, "Ka");
+	//int kdUniform = glGetUniformLocation(program, "Kd");
+	//int ksUniform = glGetUniformLocation(program, "Ks");
+	//int keUniform = glGetUniformLocation(program, "Ke");
+	//int opacityUniform = glGetUniformLocation(program, "opacity");
+	//int specPowUniform = glGetUniformLocation(program, "specularPower");
 
-	int alphaTexUniform = glGetUniformLocation(program, "alphaTexture");
-	int ambientTexUniform = glGetUniformLocation(program, "ambientTexture");
-	int diffuseTexUniform = glGetUniformLocation(program, "diffuseTexture");
-	int specTexUniform = glGetUniformLocation(program, "specularTexture");
-	int specHighlightTexUniform = glGetUniformLocation(program, "specularHighlightTexture");
-	int normalTexUniform = glGetUniformLocation(program, "normalTexture");
-	int dispTexUniform = glGetUniformLocation(program, "displacementTexture");
+	//int alphaTexUniform = glGetUniformLocation(program, "alphaTexture");
+	//int ambientTexUniform = glGetUniformLocation(program, "ambientTexture");
+	//int diffuseTexUniform = glGetUniformLocation(program, "diffuseTexture");
+	//int specTexUniform = glGetUniformLocation(program, "specularTexture");
+	//int specHighlightTexUniform = glGetUniformLocation(program, "specularHighlightTexture");
+	//int normalTexUniform = glGetUniformLocation(program, "normalTexture");
+	//int dispTexUniform = glGetUniformLocation(program, "displacementTexture");
 
-	// set texture slots (these don't change per material)
-	if (diffuseTexUniform >= 0)
-		glUniform1i(diffuseTexUniform, 0);
-	if (alphaTexUniform >= 0)
-		glUniform1i(alphaTexUniform, 1);
-	if (ambientTexUniform >= 0)
-		glUniform1i(ambientTexUniform, 2);
-	if (specTexUniform >= 0)
-		glUniform1i(specTexUniform, 3);
-	if (specHighlightTexUniform >= 0)
-		glUniform1i(specHighlightTexUniform, 4);
-	if (normalTexUniform >= 0)
-		glUniform1i(normalTexUniform, 5);
-	if (dispTexUniform >= 0)
-		glUniform1i(dispTexUniform, 6);
+	//// set texture slots (these don't change per material)
+	//if (diffuseTexUniform >= 0)
+	//	glUniform1i(diffuseTexUniform, 0);
+	//if (alphaTexUniform >= 0)
+	//	glUniform1i(alphaTexUniform, 1);
+	//if (ambientTexUniform >= 0)
+	//	glUniform1i(ambientTexUniform, 2);
+	//if (specTexUniform >= 0)
+	//	glUniform1i(specTexUniform, 3);
+	//if (specHighlightTexUniform >= 0)
+	//	glUniform1i(specHighlightTexUniform, 4);
+	//if (normalTexUniform >= 0)
+	//	glUniform1i(normalTexUniform, 5);
+	//if (dispTexUniform >= 0)
+	//	glUniform1i(dispTexUniform, 6);
 
 	int currentMaterial = -1;
 

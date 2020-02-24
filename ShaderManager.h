@@ -12,7 +12,10 @@ public:
 	~ShaderManager();
 
 	void UseProgram();
-	void SetUniform(const char* uniformName, const GLfloat* value);
+	void SetUniform(const char* uniformName, glm::mat4 value);
+	void SetUniform(const char* uniformName, glm::mat3 value);
+	void SetUniform(const char* uniformName, glm::vec4 value);
+	void SetUniform(const char* uniformName, glm::vec3 value);
 
 private:
 

@@ -159,6 +159,7 @@
     <ClCompile Include="Source.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%SolutionDir/Dependencies</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="Dependencies\tiny_obj_loader.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="Shape.h" />
+    <ClInclude Include="Sprite.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

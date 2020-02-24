@@ -1,8 +1,6 @@
 #include "Shape.h"
 #include "ext.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"	//For textures
 
 using namespace glxy;
 
@@ -94,8 +92,6 @@ void Shape::LoadMesh()
 	//Set the attributes of each vertex
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(glm::vec3));
 
 	//Unbind the array and buffers for safety
 	glBindVertexArray(0);
@@ -103,65 +99,6 @@ void Shape::LoadMesh()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-
-
-
-Quad::Quad(glm::vec3 position, float scale) : Shape(position, scale)
-{
-	CreateMesh();
-	LoadMesh();
-}
-Quad::~Quad()
-{
-	glDeleteTextures(1, &m_texture);
-}
-void Quad::LoadTexture(const char* texturePath)
-{
-	int x, y, n;
-	unsigned char* texData = stbi_load(texturePath, &x, &y, &n, 0);
-
-	glGenTextures(1, &m_texture);
-	glBindTexture(GL_TEXTURE_2D, m_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
-
-	//Generate the mipmaps so the texture can be sampled
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // GL_LINEAR SAMPLES texels
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // GL_NEARESTS RETURNS just closest pixel
-
-	stbi_image_free(texData);
-}
-void Quad::Draw()
-{
-	if (m_texture != 0)
-		glBindTexture(GL_TEXTURE_2D, m_texture);
-	Shape::Draw();
-	if (m_texture != 0)
-		glBindTexture(GL_TEXTURE_2D, 0);	//Unbind the texture so that other things aren't rendered with it
-}
-void Quad::CreateMesh()
-{
-	m_vertexAmount = 4;
-	m_vertices = new Vertex[m_vertexAmount];
-
-	//Set the vertex positions
-	m_vertices[0].position = glm::vec3(-0.5f, 0.5f, 0.0f);
-	m_vertices[1].position = glm::vec3(0.5f, 0.5f, 0.0f);
-	m_vertices[2].position = glm::vec3(-0.5f, -0.5f, 0.0f);
-	m_vertices[3].position = glm::vec3(0.5f, -0.5f, 0.0f);
-
-	//Set the vertex UVs
-	m_vertices[0].UV = glm::vec2(0.0f, 0.0f);
-	m_vertices[1].UV = glm::vec2(1.0f, 0.0f);
-	m_vertices[2].UV = glm::vec2(0.0f, 1.0f);
-	m_vertices[3].UV = glm::vec2(1.0f, 1.0f);
-
-	//Create the tris
-	m_indexAmount = 6;
-	m_indexBuffer = new int[m_indexAmount]
-	{
-		0, 2, 1, 1, 2, 3
-	};
-}
 
 
 Cube::Cube(glm::vec3 position, float scale) : Shape(position, scale)

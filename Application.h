@@ -6,6 +6,7 @@
 
 #include "Camera.h"
 #include "Shape.h"
+#include "Sprite.h"
 #include "ShaderManager.h"
 #include "Dependencies\OBJMesh.h"
 
@@ -18,7 +19,9 @@ public:
 
 	void Run();
 
-	ShaderManager* pShaderMan = nullptr;
+	ShaderManager* pShapeShader = nullptr;
+	ShaderManager* pSpriteShader = nullptr;
+	ShaderManager* pLitShader = nullptr;
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
@@ -32,7 +35,8 @@ private:
 
 	glm::mat4 m_model;
 	Camera* m_pCamera;
-	glxy::Quad* m_pQuad;
+	glxy::Sprite* m_pSprite;
 	glxy::Cube* m_pCube;
+	aie::OBJMesh m_pSoldierModel;
 
 };

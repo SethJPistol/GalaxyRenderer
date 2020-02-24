@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-#define MOVE_SPEED_DEFAULT 4.0f
+#define MOVE_SPEED_DEFAULT 400.0f
 #define ROTATE_SPEED_DEFAULT 0.1f
 
 Camera::Camera()

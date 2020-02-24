@@ -75,10 +75,25 @@ void ShaderManager::UseProgram()
 	glUseProgram(m_shaderProgramID);	//Use the shader program, now it is bound
 }
 
-void ShaderManager::SetUniform(const char* uniformName, const GLfloat* value)
+void ShaderManager::SetUniform(const char* uniformName, glm::mat4 value)
 {
-	auto uniform_location = glGetUniformLocation(m_shaderProgramID, uniformName);
-	glUniformMatrix4fv(uniform_location, 1, false, value);
+	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
+	glUniformMatrix4fv(uniformLocation, 1, false, glm::value_ptr(value));
+}
+void ShaderManager::SetUniform(const char* uniformName, glm::mat3 value)
+{
+	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
+	glUniformMatrix3fv(uniformLocation, 1, false, glm::value_ptr(value));
+}
+void ShaderManager::SetUniform(const char* uniformName, glm::vec4 value)
+{
+	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
+	glUniform4fv(uniformLocation, 1, glm::value_ptr(value));
+}
+void ShaderManager::SetUniform(const char* uniformName, glm::vec3 value)
+{
+	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
+	glUniform3fv(uniformLocation, 1, glm::value_ptr(value));
 }
 
 void ShaderManager::ShaderCompileCheck(unsigned int shaderID, const char* errorMessage)

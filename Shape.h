@@ -11,7 +11,6 @@ namespace glxy
 		struct Vertex
 		{
 			glm::vec3 position;
-			glm::vec2 UV;
 		};
 
 		Shape(glm::vec3 position = glm::vec3(0), float scale = 1.0f);
@@ -44,21 +43,6 @@ namespace glxy
 
 		glm::mat4 m_localTransform;
 		float m_scale = 1.0f;
-	};
-
-
-
-	class Quad : public Shape
-	{
-	public:
-		Quad(glm::vec3 position = glm::vec3(0), float scale = 1.0f);
-		~Quad();
-		void LoadTexture(const char* texturePath);
-		void Draw() override;	//Override to draw the texture, if present
-
-	private:
-		void CreateMesh();
-		unsigned int m_texture = 0;
 	};
 
 
