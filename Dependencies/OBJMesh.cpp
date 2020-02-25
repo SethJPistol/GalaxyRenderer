@@ -5,6 +5,10 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
+//For textures
+//#define STB_IMAGE_IMPLEMENTATION //Uncomment if definition not present anywhere
+#include "stb_image.h"
+
 namespace aie {
 
 OBJMesh::~OBJMesh() {
@@ -99,9 +103,9 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 		for (size_t i = 0; i < vertCount; ++i) 
 		{
 			if (hasPosition)
-				vertices[i].position = glm::vec4(s.mesh.positions[i * 3 + 0], s.mesh.positions[i * 3 + 1], s.mesh.positions[i * 3 + 2], 1);
+				vertices[i].position = glm::vec3(s.mesh.positions[i * 3 + 0], s.mesh.positions[i * 3 + 1], s.mesh.positions[i * 3 + 2]);
 			if (hasNormal)
-				vertices[i].normal = glm::vec4(s.mesh.normals[i * 3 + 0], s.mesh.normals[i * 3 + 1], s.mesh.normals[i * 3 + 2], 0);
+				vertices[i].normal = glm::vec3(s.mesh.normals[i * 3 + 0], s.mesh.normals[i * 3 + 1], s.mesh.normals[i * 3 + 2]);
 
 			// flip the T / V (might not always be needed, depends on how mesh was made)
 			if (hasTexture)
@@ -120,19 +124,19 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 
 		// enable first element as positions
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
 		// enable normals
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 1));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)(sizeof(glm::vec3)));
 
 		// enable texture coords
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 2));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3) * 2));
 
 		// enable tangents
 		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4) * 2 + sizeof(glm::vec2)));
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3) * 2 + sizeof(glm::vec2)));
 
 		// bind 0 for safety
 		glBindVertexArray(0);
@@ -149,6 +153,22 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 	return true;
 }
 
+void OBJMesh::LoadTexture(const char* texturePath)
+{
+	int x, y, n;
+	unsigned char* texData = stbi_load(texturePath, &x, &y, &n, 0);
+
+	glGenTextures(1, &m_texture);
+	glBindTexture(GL_TEXTURE_2D, m_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+
+	//Generate the mipmaps so the texture can be sampled
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // GL_LINEAR SAMPLES texels
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // GL_NEARESTS RETURNS just closest pixel
+
+	stbi_image_free(texData);
+}
+
 void OBJMesh::draw(bool usePatches /* = false */) {
 
 	int program = -1;
@@ -158,6 +178,9 @@ void OBJMesh::draw(bool usePatches /* = false */) {
 		printf("No shader bound!\n");
 		return;
 	}
+
+	if (m_texture != 0)
+		glBindTexture(GL_TEXTURE_2D, m_texture);
 
 	auto ambientUniform = glGetUniformLocation(program, "material_ambient");
 	auto diffuseUniform = glGetUniformLocation(program, "material_diffuse");
@@ -279,6 +302,9 @@ void OBJMesh::draw(bool usePatches /* = false */) {
 		else
 			glDrawElements(GL_TRIANGLES, c.indexCount, GL_UNSIGNED_INT, 0);
 	}
+
+	if (m_texture != 0)
+		glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void OBJMesh::calculateTangents(std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {
@@ -293,9 +319,9 @@ void OBJMesh::calculateTangents(std::vector<Vertex>& vertices, const std::vector
 		long i2 = indices[a + 1];
 		long i3 = indices[a + 2];
 
-		const glm::vec4& v1 = vertices[i1].position;
-		const glm::vec4& v2 = vertices[i2].position;
-		const glm::vec4& v3 = vertices[i3].position;
+		const glm::vec4& v1 = glm::vec4(vertices[i1].position, 1.0f);
+		const glm::vec4& v2 = glm::vec4(vertices[i2].position, 1.0f);
+		const glm::vec4& v3 = glm::vec4(vertices[i3].position, 1.0f);
 
 		const glm::vec2& w1 = vertices[i1].texcoord;
 		const glm::vec2& w2 = vertices[i2].texcoord;

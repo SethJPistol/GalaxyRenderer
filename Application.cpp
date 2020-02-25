@@ -22,6 +22,8 @@ Application::Application()
 
 	//TEXTURES
 	m_pSprite->LoadTexture("Assets/test.png");
+	//m_soldierModel.LoadTexture("Assets\\WinterSoldier\\Textures\\Char_AS_Albedo.png");
+	m_soldierModel.LoadTexture("Assets/test.png");
 
 
 	//MATERIALS

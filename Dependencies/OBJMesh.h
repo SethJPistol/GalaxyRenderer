@@ -13,8 +13,8 @@ public:
 
 	// a vertex structure for obj files
 	struct Vertex {
-		glm::vec4 position; // added to attrib location 0
-		glm::vec4 normal;	// added to attrib location 1
+		glm::vec3 position; // added to attrib location 0
+		glm::vec3 normal;	// added to attrib location 1
 		glm::vec2 texcoord;	// added to attrib location 2
 
 							// normal-mapping data
@@ -51,6 +51,9 @@ public:
 	// will fail if a mesh has already been loaded in to this instance
 	bool load(const char* filename, bool loadTextures = true, bool flipTextureV = false);
 
+	//Loads a texture and binds it
+	void LoadTexture(const char* texturePath);
+
 	// allow option to draw as patches for tessellation
 	void draw(bool usePatches = false);
 
@@ -76,6 +79,8 @@ private:
 	std::string				m_filename;
 	std::vector<MeshChunk>	m_meshChunks;
 	//std::vector<Material>	m_materials;
+
+	unsigned int m_texture = 0;
 };
 
 } // namespace aie

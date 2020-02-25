@@ -3,7 +3,10 @@
 
 in vec3 final_normal;
 in vec4 cam_space_position;
+in vec2 final_texture_coordinates;
 
+
+uniform sampler2D diffuse_texture;
 
 uniform vec3 camera_position;
 
@@ -42,5 +45,8 @@ void main()
 	vec3 diffuse = material_diffuse * light_diffuse * diffuse_term;
 	vec3 specular = material_specular * light_specular * specular_term;
 	
-	final_color = vec4(ambient + diffuse + specular, 1);
+	//Get the texture colour
+	vec4 texture_color = texture(diffuse_texture, final_texture_coordinates);
+	
+	final_color = vec4((ambient + diffuse + specular) + texture_color.xyz, 1);
 }
