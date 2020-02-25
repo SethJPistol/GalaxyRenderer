@@ -17,22 +17,37 @@ Application::Application()
 	//MESHES
 	m_pSprite = new glxy::Sprite();
 	m_pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
-	bool loaded = m_pSoldierModel.load("Assets\\WinterSoldier\\Model\\ASOBJ.obj", false);
+	bool loaded = m_soldierModel.load("Assets\\WinterSoldier\\Model\\CharAS.obj", false);
 
 
-	//TEXTURE
+	//TEXTURES
 	m_pSprite->LoadTexture("Assets/test.png");
+
+
+	//MATERIALS
+	m_soldierModel.m_materials[0].ambient = glm::vec3(1.0f, 0, 0);
+	m_soldierModel.m_materials[0].diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_soldierModel.m_materials[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_soldierModel.m_materials[0].specularPower = 32.0f;
 
 
 	//CAMERA
 	m_model = glm::mat4(1);
-	m_pCamera = new Camera();
+	m_pCamera = new glxy::Camera();
 
 
 	//SHADERS
-	pShapeShader = new ShaderManager("Shaders\\VertexShaderBasic.glsl", "Shaders\\FragmentShaderBasic.glsl");
-	pSpriteShader = new ShaderManager("Shaders\\VertexShaderSprite.glsl", "Shaders\\FragmentShaderSprite.glsl");
-	pLitShader = new ShaderManager("Shaders\\VertexShaderLit.glsl", "Shaders\\FragmentShaderLit.glsl");
+	pShapeShader = new glxy::ShaderManager("Shaders\\VertexShaderBasic.glsl", "Shaders\\FragmentShaderBasic.glsl");
+	pSpriteShader = new glxy::ShaderManager("Shaders\\VertexShaderSprite.glsl", "Shaders\\FragmentShaderSprite.glsl");
+	pLitShader = new glxy::ShaderManager("Shaders\\VertexShaderLit.glsl", "Shaders\\FragmentShaderLit.glsl");
+
+
+	//LIGHTING
+	m_ambientLight = glm::vec3(0.2f, 0.2f, 0.2f);
+	m_pLight = new glxy::Light();
+	m_pLight->direction = glm::vec3(-1.0f, 0.0f, 0.0f);
+	m_pLight->diffuse = glm::vec3(1.0f, 0.7f, 0.7f);	//Set light's diffuse to light pink
+	m_pLight->specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
 
 	//RENDER SETTINGS
@@ -52,6 +67,8 @@ Application::~Application()
 	delete pShapeShader;
 	delete pSpriteShader;
 	delete pLitShader;
+
+	delete m_pLight;
 
 	delete m_pCamera;
 	delete m_pSprite;
@@ -80,12 +97,11 @@ void Application::Run()
 
 		glm::mat4 pv = m_pCamera->GetPV();
 
-		glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 		//Shape drawing
+		glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		pShapeShader->UseProgram();	//Bind the shaders
 		pShapeShader->SetUniform("projection_view_matrix", pv);
-		pShapeShader->SetUniform("model_matrix", m_model);
 		pShapeShader->SetUniform("color", color);
 		m_pCube->Draw();
 
@@ -93,7 +109,6 @@ void Application::Run()
 		//Sprite drawing
 		pSpriteShader->UseProgram();	//Bind the shaders
 		pSpriteShader->SetUniform("projection_view_matrix", pv);
-		pSpriteShader->SetUniform("model_matrix", m_model);
 		m_pSprite->Draw();
 
 
@@ -102,8 +117,10 @@ void Application::Run()
 		pLitShader->SetUniform("projection_view_matrix", pv);
 		pLitShader->SetUniform("model_matrix", m_model);
 		pLitShader->SetUniform("normal_matrix", glm::inverseTranspose(glm::mat3(m_model)));	//Probably should be done separately on object itself
-		pLitShader->SetUniform("directional_light", glm::vec3(-1.0f, 0.0f, 0.0f));
-		m_pSoldierModel.draw();
+		pLitShader->SetUniform("camera_position", m_pCamera->GetPosition());
+		pLitShader->SetUniform("light_ambient", m_ambientLight);
+		m_pLight->Update();		//Sets the uniform values for the light
+		m_soldierModel.draw();
 
 
 		bool inputFlag = false;
@@ -131,8 +148,8 @@ void Application::Run()
 
 		if (inputFlag)
 		{
-			//pCube->SetPosition((pCube->GetPosition()) + displacement * 2.0f * deltaTime);
-			//glm::vec3 pos = pCube->GetPosition();
+			m_pCube->SetPosition((m_pCube->GetPosition()) + displacement * 2.0f * deltaTime);
+			glm::vec3 pos = m_pCube->GetPosition();
 		}
 
 

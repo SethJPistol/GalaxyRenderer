@@ -42,13 +42,13 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 	// copy materials
 	m_materials.resize(materials.size());
 	int index = 0;
-	//for (auto& m : materials) {
-	//
-	//	m_materials[index].ambient = glm::vec3(m.ambient[0], m.ambient[1], m.ambient[2]);
-	//	m_materials[index].diffuse = glm::vec3(m.diffuse[0], m.diffuse[1], m.diffuse[2]);
-	//	m_materials[index].specular = glm::vec3(m.specular[0], m.specular[1], m.specular[2]);
+	for (auto& m : materials) 
+	{
+		m_materials[index].ambient = glm::vec3(m.ambient[0], m.ambient[1], m.ambient[2]);
+		m_materials[index].diffuse = glm::vec3(m.diffuse[0], m.diffuse[1], m.diffuse[2]);
+		m_materials[index].specular = glm::vec3(m.specular[0], m.specular[1], m.specular[2]);
 	//	m_materials[index].emissive = glm::vec3(m.emission[0], m.emission[1], m.emission[2]);
-	//	m_materials[index].specularPower = m.shininess;
+		m_materials[index].specularPower = m.shininess;
 	//	m_materials[index].opacity = m.dissolve;
 	//
 	//	// textures
@@ -60,12 +60,13 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 	//	m_materials[index].normalTexture.load((folder + m.bump_texname).c_str());
 	//	m_materials[index].displacementTexture.load((folder + m.displacement_texname).c_str());
 	//
-	//	++index;
-	//}
+		++index;
+	}
 
 	// copy shapes
 	m_meshChunks.reserve(shapes.size());
-	for (auto& s : shapes) {
+	for (auto& s : shapes) 
+	{
 
 		MeshChunk chunk;
 
@@ -95,7 +96,8 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 		bool hasNormal = s.mesh.normals.empty() == false;
 		bool hasTexture = s.mesh.texcoords.empty() == false;
 
-		for (size_t i = 0; i < vertCount; ++i) {
+		for (size_t i = 0; i < vertCount; ++i) 
+		{
 			if (hasPosition)
 				vertices[i].position = glm::vec4(s.mesh.positions[i * 3 + 0], s.mesh.positions[i * 3 + 1], s.mesh.positions[i * 3 + 2], 1);
 			if (hasNormal)
@@ -157,6 +159,11 @@ void OBJMesh::draw(bool usePatches /* = false */) {
 		return;
 	}
 
+	auto ambientUniform = glGetUniformLocation(program, "material_ambient");
+	auto diffuseUniform = glGetUniformLocation(program, "material_diffuse");
+	auto specularUniform = glGetUniformLocation(program, "material_specular");
+	auto specPowerUniform = glGetUniformLocation(program, "material_specular_power");
+
 	// pull uniforms from the shader
 	//int kaUniform = glGetUniformLocation(program, "Ka");
 	//int kdUniform = glGetUniformLocation(program, "Kd");
@@ -192,23 +199,35 @@ void OBJMesh::draw(bool usePatches /* = false */) {
 	int currentMaterial = -1;
 
 	// draw the mesh chunks
-	for (auto& c : m_meshChunks) {
+	for (auto& c : m_meshChunks) 
+	{
+		//Set the lighting uniforms
+		if (ambientUniform >= 0)
+			glUniform3fv(ambientUniform, 1, &m_materials[0].ambient[0]);
+		if (diffuseUniform >= 0)
+			glUniform3fv(diffuseUniform, 1, &m_materials[0].diffuse[0]);
+		if (specularUniform >= 0)
+			glUniform3fv(specularUniform, 1, &m_materials[0].specular[0]);
+		if (specPowerUniform >= 0)
+			glUniform1f(specPowerUniform, m_materials[0].specularPower);
+
 
 		// bind material
-		//if (currentMaterial != c.materialID) {
+		//if (currentMaterial != c.materialID) 
+		//{
 		//	currentMaterial = c.materialID;
-		//	if (kaUniform >= 0)
-		//		glUniform3fv(kaUniform, 1, &m_materials[currentMaterial].ambient[0]);
-		//	if (kdUniform >= 0)
-		//		glUniform3fv(kdUniform, 1, &m_materials[currentMaterial].diffuse[0]);
-		//	if (ksUniform >= 0)
-		//		glUniform3fv(ksUniform, 1, &m_materials[currentMaterial].specular[0]);
-		//	if (keUniform >= 0)
-		//		glUniform3fv(keUniform, 1, &m_materials[currentMaterial].emissive[0]);
-		//	if (opacityUniform >= 0)
-		//		glUniform1f(opacityUniform, m_materials[currentMaterial].opacity);
-		//	if (specPowUniform >= 0)
-		//		glUniform1f(specPowUniform, m_materials[currentMaterial].specularPower);
+		//	if (ambientUniform >= 0)
+		//		glUniform3fv(ambientUniform, 1, &m_materials[currentMaterial].ambient[0]);
+		//	if (diffuseUniform >= 0)
+		//		glUniform3fv(diffuseUniform, 1, &m_materials[currentMaterial].diffuse[0]);
+		//	if (specularUniform >= 0)
+		//		glUniform3fv(specularUniform, 1, &m_materials[currentMaterial].specular[0]);
+		////	if (keUniform >= 0)
+		////		glUniform3fv(keUniform, 1, &m_materials[currentMaterial].emissive[0]);
+		////	if (opacityUniform >= 0)
+		////		glUniform1f(opacityUniform, m_materials[currentMaterial].opacity);
+		//	if (specPowerUniform >= 0)
+		//		glUniform1f(specPowerUniform, m_materials[currentMaterial].specularPower);
 		//
 		//	glActiveTexture(GL_TEXTURE0);
 		//	if (m_materials[currentMaterial].diffuseTexture.getHandle() > 0)

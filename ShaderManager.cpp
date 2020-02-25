@@ -5,6 +5,8 @@
 #include <fstream>	//For strings and other stuff
 #include <sstream>
 
+using namespace glxy;
+
 ShaderManager::ShaderManager(const char* vertShaderPath, const char* fragShaderPath)
 {
 	m_vertexShaderID = 0;

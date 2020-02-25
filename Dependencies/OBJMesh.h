@@ -61,6 +61,8 @@ public:
 	size_t getMaterialCount() const { return m_materials.size();  }
 	Material& getMaterial(size_t index) { return m_materials[index];  }
 
+	std::vector<Material>	m_materials;	//Moved to public for Application access
+
 private:
 
 	void calculateTangents(std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
@@ -73,7 +75,7 @@ private:
 
 	std::string				m_filename;
 	std::vector<MeshChunk>	m_meshChunks;
-	std::vector<Material>	m_materials;
+	//std::vector<Material>	m_materials;
 };
 
 } // namespace aie

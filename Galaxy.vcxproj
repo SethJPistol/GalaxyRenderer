@@ -154,6 +154,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Dependencies\glcore\gl_core_4_5.c" />
     <ClCompile Include="Dependencies\OBJMesh.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="Source.cpp">
@@ -166,6 +167,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Dependencies\OBJMesh.h" />
     <ClInclude Include="Dependencies\tiny_obj_loader.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Sprite.h" />

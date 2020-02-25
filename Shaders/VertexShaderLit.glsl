@@ -8,9 +8,12 @@ uniform mat4 model_matrix;
 uniform mat3 normal_matrix;
 
 out vec3 final_normal;
+out vec4 cam_space_position;
 
 void main()
 {
 	final_normal = normal_matrix * normal.xyz;
-	gl_Position = (projection_view_matrix * model_matrix) * vec4(vertex_position, 1);
+	
+	cam_space_position = model_matrix * vec4(vertex_position, 1);
+	gl_Position = projection_view_matrix * cam_space_position;
 }

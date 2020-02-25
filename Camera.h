@@ -4,33 +4,38 @@
 #include "glfw3.h"
 #include "ext.hpp"
 
-class Camera
+
+namespace glxy
 {
-public:
+	class Camera
+	{
+	public:
 
-	Camera();
-	Camera(glm::vec3 position, glm::vec3 pointToLookAt);
+		Camera();
+		Camera(glm::vec3 position, glm::vec3 pointToLookAt);
 
-	void Update(float deltaTime);
+		void Update(float deltaTime);
 
-	glm::mat4 GetPV();
-	void SetMoveSpeed(float speed);
-	void SetRotateSpeed(float speed);
+		glm::mat4 GetPV();
+		glm::vec3 GetPosition();
+		void SetMoveSpeed(float speed);
+		void SetRotateSpeed(float speed);
 
 
-private:
+	private:
 
-	glm::mat4 m_worldTransform;
-	glm::mat4 m_viewTransform;
-	glm::mat4 m_projectionTransform;
-	glm::mat4 m_PVTransform;
+		glm::mat4 m_worldTransform;
+		glm::mat4 m_viewTransform;
+		glm::mat4 m_projectionTransform;
+		glm::mat4 m_PVTransform;
 
-	GLFWwindow* m_pWindow;
+		GLFWwindow* m_pWindow;
 
-	float m_moveSpeed;
-	float m_rotateSpeed;
+		float m_moveSpeed;
+		float m_rotateSpeed;
 
-	double m_prevMouseX, m_prevMouseY;
+		double m_prevMouseX, m_prevMouseY;
 
-	bool m_mouseHeld = false;
-};
+		bool m_mouseHeld = false;
+	};
+}

@@ -9,6 +9,7 @@
 #include "Sprite.h"
 #include "ShaderManager.h"
 #include "Dependencies\OBJMesh.h"
+#include "Light.h"
 
 class Application
 {
@@ -19,9 +20,9 @@ public:
 
 	void Run();
 
-	ShaderManager* pShapeShader = nullptr;
-	ShaderManager* pSpriteShader = nullptr;
-	ShaderManager* pLitShader = nullptr;
+	glxy::ShaderManager* pShapeShader = nullptr;
+	glxy::ShaderManager* pSpriteShader = nullptr;
+	glxy::ShaderManager* pLitShader = nullptr;
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
@@ -34,9 +35,12 @@ private:
 	GLFWwindow* m_window;
 
 	glm::mat4 m_model;
-	Camera* m_pCamera;
+	glxy::Camera* m_pCamera;
 	glxy::Sprite* m_pSprite;
 	glxy::Cube* m_pCube;
-	aie::OBJMesh m_pSoldierModel;
+	aie::OBJMesh m_soldierModel;
+
+	glm::vec3 m_ambientLight;
+	glxy::Light* m_pLight;
 
 };

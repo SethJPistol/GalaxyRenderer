@@ -1,7 +1,9 @@
 #include "Camera.h"
 
-#define MOVE_SPEED_DEFAULT 400.0f
+#define MOVE_SPEED_DEFAULT 4.0f
 #define ROTATE_SPEED_DEFAULT 0.1f
+
+using namespace glxy;
 
 Camera::Camera()
 {
@@ -154,6 +156,11 @@ void Camera::Update(float deltaTime)
 glm::mat4 Camera::GetPV()
 {
 	return m_PVTransform;
+}
+
+glm::vec3 Camera::GetPosition()
+{
+	return glm::vec3(m_worldTransform[3]);
 }
 
 void Camera::SetMoveSpeed(float speed)
