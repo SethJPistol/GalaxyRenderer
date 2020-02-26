@@ -48,5 +48,5 @@ void main()
 	//Get the texture colour
 	vec4 texture_color = texture(diffuse_texture, final_texture_coordinates);
 	
-	final_color = vec4((ambient + diffuse + specular) + texture_color.xyz, 1);
+	final_color = vec4(ambient + (diffuse * texture_color.xyz) + specular, 1);
 }

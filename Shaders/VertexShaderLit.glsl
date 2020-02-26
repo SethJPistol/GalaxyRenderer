@@ -14,7 +14,8 @@ out vec2 final_texture_coordinates;
 
 void main()
 {
-	final_texture_coordinates = texture_coordinates;
+	//Flip the UVs vertically so that the top left is 0,0
+	final_texture_coordinates = texture_coordinates; //* vec2(1, -1);
 
 	final_normal = normal_matrix * normal.xyz;
 	

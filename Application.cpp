@@ -17,17 +17,18 @@ Application::Application()
 	//MESHES
 	m_pSprite = new glxy::Sprite();
 	m_pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
-	bool loaded = m_soldierModel.load("Assets\\WinterSoldier\\Model\\CharAS.obj", false);
+	bool loaded = m_soldierModel.load("Assets\\WinterSoldier\\Model\\CharAS.obj", false, true);	//Final value true so the UVs are flipped vertically
 
 
 	//TEXTURES
 	m_pSprite->LoadTexture("Assets/test.png");
-	//m_soldierModel.LoadTexture("Assets\\WinterSoldier\\Textures\\Char_AS_Albedo.png");
-	m_soldierModel.LoadTexture("Assets/test.png");
+	m_soldierModel.LoadTexture("Assets\\WinterSoldier\\Textures\\Char_AS_Albedo.png");
+	//m_soldierModel.LoadTexture("Assets/test2.png");
+	//m_soldierModel.LoadTexture("Assets/Char_AS_Albedo.png");
 
 
 	//MATERIALS
-	m_soldierModel.m_materials[0].ambient = glm::vec3(1.0f, 0, 0);
+	m_soldierModel.m_materials[0].ambient = glm::vec3(0.5f, 0.5f, 0.5f);
 	m_soldierModel.m_materials[0].diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_soldierModel.m_materials[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_soldierModel.m_materials[0].specularPower = 32.0f;
@@ -48,12 +49,12 @@ Application::Application()
 	m_ambientLight = glm::vec3(0.2f, 0.2f, 0.2f);
 	m_pLight = new glxy::Light();
 	m_pLight->direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	m_pLight->diffuse = glm::vec3(1.0f, 0.7f, 0.7f);	//Set light's diffuse to light pink
+	m_pLight->diffuse = glm::vec3(1.0f, 1.0f, 1.0f);	//Set light's diffuse to light pink
 	m_pLight->specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
 
 	//RENDER SETTINGS
-	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);	//Set the colour to clear the screen to
+	glClearColor(0.9f, 0.9f, 0.9f, 0.0f);	//Set the colour to clear the screen to
 	glPolygonMode(GL_BACK, GL_LINE);		//Set to render back faces in wireframe mode
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);	//Set to render all faces in wireframe mode
 	glEnable(GL_CULL_FACE);
@@ -121,6 +122,8 @@ void Application::Run()
 		pLitShader->SetUniform("normal_matrix", glm::inverseTranspose(glm::mat3(m_model)));	//Probably should be done separately on object itself
 		pLitShader->SetUniform("camera_position", m_pCamera->GetPosition());
 		pLitShader->SetUniform("light_ambient", m_ambientLight);
+		m_pLight->direction = glm::vec3(glm::cos(deltaTime), 0.0f, 0.0f);
+		printf("Light X: %f\n", m_pLight->direction.x);
 		m_pLight->Update();		//Sets the uniform values for the light
 		m_soldierModel.draw();
 
