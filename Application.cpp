@@ -47,10 +47,10 @@ Application::Application()
 
 	//LIGHTING
 	m_ambientLight = glm::vec3(0.2f, 0.2f, 0.2f);
-	m_pLight = new glxy::Light();
-	m_pLight->direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	m_pLight->diffuse = glm::vec3(1.0f, 1.0f, 1.0f);	//Set light's diffuse to light pink
-	m_pLight->specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_pDirLight = new glxy::Light();
+	m_pDirLight->direction = glm::vec3(-1.0f, 0.0f, 0.0f);
+	m_pDirLight->diffuse = glm::vec3(1.0f, 1.0f, 1.0f);	//Set light's diffuse to light pink
+	m_pDirLight->specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
 
 	//RENDER SETTINGS
@@ -71,7 +71,7 @@ Application::~Application()
 	delete pSpriteShader;
 	delete pLitShader;
 
-	delete m_pLight;
+	delete m_pDirLight;
 
 	delete m_pCamera;
 	delete m_pSprite;
@@ -94,6 +94,7 @@ void Application::Run()
 		float currentFrame = (float)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+		totalTime += deltaTime;
 
 		//CAMERA MOVEMENT
 		m_pCamera->Update(deltaTime);
@@ -122,9 +123,8 @@ void Application::Run()
 		pLitShader->SetUniform("normal_matrix", glm::inverseTranspose(glm::mat3(m_model)));	//Probably should be done separately on object itself
 		pLitShader->SetUniform("camera_position", m_pCamera->GetPosition());
 		pLitShader->SetUniform("light_ambient", m_ambientLight);
-		m_pLight->direction = glm::vec3(glm::cos(deltaTime), 0.0f, 0.0f);
-		printf("Light X: %f\n", m_pLight->direction.x);
-		m_pLight->Update();		//Sets the uniform values for the light
+		m_pDirLight->direction = glm::vec3(glm::cos(totalTime), 0.0f, -glm::sin(totalTime));
+		m_pDirLight->Update();		//Sets the uniform values for the light
 		m_soldierModel.draw();
 
 

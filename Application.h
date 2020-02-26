@@ -26,6 +26,7 @@ public:
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
+	float totalTime = 0.0f;
 
 private:
 
@@ -41,6 +42,7 @@ private:
 	aie::OBJMesh m_soldierModel;
 
 	glm::vec3 m_ambientLight;
-	glxy::Light* m_pLight;
+	glxy::Light* m_pDirLight;
+	glxy::Light* m_pDirLight2;
 
 };
