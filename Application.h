@@ -41,8 +41,6 @@ private:
 	glxy::Cube* m_pCube;
 	aie::OBJMesh m_soldierModel;
 
-	glm::vec3 m_ambientLight;
-	glxy::Light* m_pDirLight;
-	glxy::Light* m_pDirLight2;
+	std::vector<glxy::DirectionalLight> m_directionalLights;
 
 };

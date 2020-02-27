@@ -23,15 +23,13 @@ Application::Application()
 	//TEXTURES
 	m_pSprite->LoadTexture("Assets/test.png");
 	m_soldierModel.LoadTexture("Assets\\WinterSoldier\\Textures\\Char_AS_Albedo.png");
-	//m_soldierModel.LoadTexture("Assets/test2.png");
-	//m_soldierModel.LoadTexture("Assets/Char_AS_Albedo.png");
 
 
 	//MATERIALS
 	m_soldierModel.m_materials[0].ambient = glm::vec3(0.5f, 0.5f, 0.5f);
 	m_soldierModel.m_materials[0].diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_soldierModel.m_materials[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
-	m_soldierModel.m_materials[0].specularPower = 32.0f;
+	m_soldierModel.m_materials[0].specularPower = 16.0f;
 
 
 	//CAMERA
@@ -46,11 +44,18 @@ Application::Application()
 
 
 	//LIGHTING
-	m_ambientLight = glm::vec3(0.2f, 0.2f, 0.2f);
-	m_pDirLight = new glxy::Light();
-	m_pDirLight->direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	m_pDirLight->diffuse = glm::vec3(1.0f, 1.0f, 1.0f);	//Set light's diffuse to light pink
-	m_pDirLight->specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_directionalLights.push_back(glxy::DirectionalLight());
+	m_directionalLights[0].direction = glm::vec3(-1.0f, 0.0f, 0.0f);
+	m_directionalLights[0].ambient = glm::vec3(0.0f, 0.2f, 0.0f);
+	m_directionalLights[0].diffuse = glm::vec3(0.5f, 1.0f, 0.5f);
+	m_directionalLights[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_directionalLights.push_back(glxy::DirectionalLight());
+	m_directionalLights[1].direction = glm::vec3(-1.0f, 0.0f, 0.0f);
+	m_directionalLights[1].ambient = glm::vec3(0.2f, 0.0f, 0.0f);
+	m_directionalLights[1].diffuse = glm::vec3(1.0f, 0.7f, 0.7f);
+	m_directionalLights[1].specular = glm::vec3(0.2f, 0.2f, 0.2f);
+
+
 
 
 	//RENDER SETTINGS
@@ -70,8 +75,6 @@ Application::~Application()
 	delete pShapeShader;
 	delete pSpriteShader;
 	delete pLitShader;
-
-	delete m_pDirLight;
 
 	delete m_pCamera;
 	delete m_pSprite;
@@ -122,9 +125,11 @@ void Application::Run()
 		pLitShader->SetUniform("model_matrix", m_model);
 		pLitShader->SetUniform("normal_matrix", glm::inverseTranspose(glm::mat3(m_model)));	//Probably should be done separately on object itself
 		pLitShader->SetUniform("camera_position", m_pCamera->GetPosition());
-		pLitShader->SetUniform("light_ambient", m_ambientLight);
-		m_pDirLight->direction = glm::vec3(glm::cos(totalTime), 0.0f, -glm::sin(totalTime));
-		m_pDirLight->Update();		//Sets the uniform values for the light
+		m_directionalLights[0].direction = glm::vec3(glm::cos(totalTime), 0.0f, -glm::sin(totalTime));	//Make the first light spin
+
+		for (int i = 0; i < m_directionalLights.size(); ++i)	//For all the directional lights in the scene,
+			m_directionalLights[i].Update(i);					//Set the uniform values for the light
+
 		m_soldierModel.draw();
 
 
