@@ -6,12 +6,12 @@
 
 namespace glxy
 {
-	class ShaderManager
+	class ShaderProgram
 	{
 	public:
 
-		ShaderManager(const char* vertShaderPath, const char* fragShaderPath);
-		~ShaderManager();
+		ShaderProgram(const char* vertShaderPath, const char* fragShaderPath);
+		~ShaderProgram();
 
 		void UseProgram();
 		void SetUniform(const char* uniformName, glm::mat4 value);

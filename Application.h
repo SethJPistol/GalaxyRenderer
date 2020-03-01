@@ -7,7 +7,7 @@
 #include "Camera.h"
 #include "Shape.h"
 #include "Sprite.h"
-#include "ShaderManager.h"
+#include "ShaderProgram.h"
 #include "Dependencies\OBJMesh.h"
 #include "Light.h"
 
@@ -20,9 +20,9 @@ public:
 
 	void Run();
 
-	glxy::ShaderManager* pShapeShader = nullptr;
-	glxy::ShaderManager* pSpriteShader = nullptr;
-	glxy::ShaderManager* pLitShader = nullptr;
+	glxy::ShaderProgram* pShapeShader = nullptr;
+	glxy::ShaderProgram* pSpriteShader = nullptr;
+	glxy::ShaderProgram* pLitShader = nullptr;
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;

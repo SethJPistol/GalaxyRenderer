@@ -1,4 +1,4 @@
-#include "ShaderManager.h"
+#include "ShaderProgram.h"
 
 #include "..\glcore\gl_core_4_5.h"
 
@@ -7,7 +7,7 @@
 
 using namespace glxy;
 
-ShaderManager::ShaderManager(const char* vertShaderPath, const char* fragShaderPath)
+ShaderProgram::ShaderProgram(const char* vertShaderPath, const char* fragShaderPath)
 {
 	m_vertexShaderID = 0;
 	m_fragmentShaderID = 0;
@@ -67,38 +67,38 @@ ShaderManager::ShaderManager(const char* vertShaderPath, const char* fragShaderP
 	ShaderProgramLinkCheck(m_shaderProgramID, "Error -Shader program failed to link");
 }
 
-ShaderManager::~ShaderManager()
+ShaderProgram::~ShaderProgram()
 {
 
 }
 
-void ShaderManager::UseProgram()
+void ShaderProgram::UseProgram()
 {
 	glUseProgram(m_shaderProgramID);	//Use the shader program, now it is bound
 }
 
-void ShaderManager::SetUniform(const char* uniformName, glm::mat4 value)
+void ShaderProgram::SetUniform(const char* uniformName, glm::mat4 value)
 {
 	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
 	glUniformMatrix4fv(uniformLocation, 1, false, glm::value_ptr(value));
 }
-void ShaderManager::SetUniform(const char* uniformName, glm::mat3 value)
+void ShaderProgram::SetUniform(const char* uniformName, glm::mat3 value)
 {
 	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
 	glUniformMatrix3fv(uniformLocation, 1, false, glm::value_ptr(value));
 }
-void ShaderManager::SetUniform(const char* uniformName, glm::vec4 value)
+void ShaderProgram::SetUniform(const char* uniformName, glm::vec4 value)
 {
 	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
 	glUniform4fv(uniformLocation, 1, glm::value_ptr(value));
 }
-void ShaderManager::SetUniform(const char* uniformName, glm::vec3 value)
+void ShaderProgram::SetUniform(const char* uniformName, glm::vec3 value)
 {
 	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
 	glUniform3fv(uniformLocation, 1, glm::value_ptr(value));
 }
 
-void ShaderManager::ShaderCompileCheck(unsigned int shaderID, const char* errorMessage)
+void ShaderProgram::ShaderCompileCheck(unsigned int shaderID, const char* errorMessage)
 {
 	//Check it worked
 	GLint success = GL_FALSE;
@@ -122,7 +122,7 @@ void ShaderManager::ShaderCompileCheck(unsigned int shaderID, const char* errorM
 		delete[] log;
 	}
 }
-void ShaderManager::ShaderProgramLinkCheck(unsigned int programID, const char* errorMessage)
+void ShaderProgram::ShaderProgramLinkCheck(unsigned int programID, const char* errorMessage)
 {
 	GLint success = GL_FALSE;
 	glGetProgramiv(programID, GL_LINK_STATUS, &success);

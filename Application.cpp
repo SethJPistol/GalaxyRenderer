@@ -38,9 +38,9 @@ Application::Application()
 
 
 	//SHADERS
-	pShapeShader = new glxy::ShaderManager("Shaders\\VertexShaderBasic.glsl", "Shaders\\FragmentShaderBasic.glsl");
-	pSpriteShader = new glxy::ShaderManager("Shaders\\VertexShaderSprite.glsl", "Shaders\\FragmentShaderSprite.glsl");
-	pLitShader = new glxy::ShaderManager("Shaders\\VertexShaderLit.glsl", "Shaders\\FragmentShaderLit.glsl");
+	pShapeShader = new glxy::ShaderProgram("Shaders\\VertexShaderBasic.glsl", "Shaders\\FragmentShaderBasic.glsl");
+	pSpriteShader = new glxy::ShaderProgram("Shaders\\VertexShaderSprite.glsl", "Shaders\\FragmentShaderSprite.glsl");
+	pLitShader = new glxy::ShaderProgram("Shaders\\VertexShaderLit.glsl", "Shaders\\FragmentShaderLit.glsl");
 
 
 	//LIGHTING
