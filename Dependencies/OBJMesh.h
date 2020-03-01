@@ -64,6 +64,11 @@ public:
 	size_t getMaterialCount() const { return m_materials.size();  }
 	Material& getMaterial(size_t index) { return m_materials[index];  }
 
+	glm::vec3 GetPosition() { return (glm::vec3)m_localTransform[3]; }
+	void SetPosition(glm::vec3 position) { m_localTransform[3] = glm::vec4(position, 1.0f); }
+	float GetScale() { return m_scale; }
+	void SetScale(float scale);
+
 	std::vector<Material>	m_materials;	//Moved to public for Application access
 
 private:
@@ -78,9 +83,11 @@ private:
 
 	std::string				m_filename;
 	std::vector<MeshChunk>	m_meshChunks;
-	//std::vector<Material>	m_materials;
 
 	unsigned int m_texture = 0;
+
+	glm::mat4 m_localTransform;
+	float m_scale = 1.0f;
 };
 
 } // namespace aie

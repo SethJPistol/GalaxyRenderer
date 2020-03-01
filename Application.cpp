@@ -15,14 +15,25 @@ Application::Application()
 	}
 
 	//MESHES
-	m_pSprite = new glxy::Sprite();
 	m_pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
+	m_pPoly = new glxy::Polygon(5, glm::vec3(-5.0f, 0.0f, 0.0f));
+	m_pPrism = new glxy::Prism(6, 2, glm::vec3(-7.5f, 0.0f, 0.0f));
+	m_pPyramid = new glxy::Pyramid(8, 2, glm::vec3(-10.0f, 0.0f, 0.0f));
+
+	m_pSprite = new glxy::Sprite(glm::vec3(5.0f, 0.0f, 0.0f));
+
 	bool loaded = m_soldierModel.load("Assets\\WinterSoldier\\Model\\CharAS.obj", false, true);	//Final value true so the UVs are flipped vertically
+	m_soldierModel.SetPosition(glm::vec3(0.0f, -2.0f, 0.0f));
+	m_soldierModel.SetScale(0.1f);
+	bool loaded2 = m_tentacleModel.load("Assets\\Tentacle\\Model\\Tentacle.obj", false, true);
+	m_tentacleModel.SetPosition(glm::vec3(3.0f, -2.0f, 0.0f));
+	m_tentacleModel.SetScale(0.01f);
 
 
 	//TEXTURES
 	m_pSprite->LoadTexture("Assets/test.png");
 	m_soldierModel.LoadTexture("Assets\\WinterSoldier\\Textures\\Char_AS_Albedo.png");
+	m_tentacleModel.LoadTexture("Assets\\Tentacle\\Textures\\Tentacle_Albedo.png");
 
 
 	//MATERIALS
@@ -30,6 +41,11 @@ Application::Application()
 	m_soldierModel.m_materials[0].diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_soldierModel.m_materials[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_soldierModel.m_materials[0].specularPower = 16.0f;
+
+	m_tentacleModel.m_materials[0].ambient = glm::vec3(0.5f, 0.5f, 0.5f);
+	m_tentacleModel.m_materials[0].diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_tentacleModel.m_materials[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_tentacleModel.m_materials[0].specularPower = 16.0f;
 
 
 	//CAMERA
@@ -48,14 +64,12 @@ Application::Application()
 	m_directionalLights[0].direction = glm::vec3(-1.0f, 0.0f, 0.0f);
 	m_directionalLights[0].ambient = glm::vec3(0.0f, 0.2f, 0.0f);
 	m_directionalLights[0].diffuse = glm::vec3(0.5f, 1.0f, 0.5f);
-	m_directionalLights[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_directionalLights[0].specular = glm::vec3(0.2f, 0.7f, 0.2f);
 	m_directionalLights.push_back(glxy::DirectionalLight());
 	m_directionalLights[1].direction = glm::vec3(-1.0f, 0.0f, 0.0f);
 	m_directionalLights[1].ambient = glm::vec3(0.2f, 0.0f, 0.0f);
 	m_directionalLights[1].diffuse = glm::vec3(1.0f, 0.7f, 0.7f);
-	m_directionalLights[1].specular = glm::vec3(0.2f, 0.2f, 0.2f);
-
-
+	m_directionalLights[1].specular = glm::vec3(0.7f, 0.2f, 0.2f);
 
 
 	//RENDER SETTINGS
@@ -77,8 +91,11 @@ Application::~Application()
 	delete pLitShader;
 
 	delete m_pCamera;
-	delete m_pSprite;
 	delete m_pCube;
+	delete m_pPoly;
+	delete m_pPrism;
+	delete m_pPyramid;
+	delete m_pSprite;
 
 	glfwDestroyWindow(m_window);
 	glfwTerminate();	//Terminate GLFW
@@ -106,11 +123,14 @@ void Application::Run()
 
 
 		//Shape drawing
-		glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		glm::vec4 color = glm::vec4(0.3f, 0.3f, 0.85f, 1.0f);
 		pShapeShader->UseProgram();	//Bind the shaders
 		pShapeShader->SetUniform("projection_view_matrix", pv);
 		pShapeShader->SetUniform("color", color);
 		m_pCube->Draw();
+		m_pPoly->Draw();
+		m_pPrism->Draw();
+		m_pPyramid->Draw();
 
 
 		//Sprite drawing
@@ -131,6 +151,7 @@ void Application::Run()
 			m_directionalLights[i].Update(i);					//Set the uniform values for the light
 
 		m_soldierModel.draw();
+		m_tentacleModel.draw();
 
 
 		bool inputFlag = false;

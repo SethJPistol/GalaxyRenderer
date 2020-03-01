@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-#define MOVE_SPEED_DEFAULT 4.0f
+#define MOVE_SPEED_DEFAULT 8.0f
 #define ROTATE_SPEED_DEFAULT 0.1f
 
 using namespace glxy;
@@ -10,7 +10,7 @@ Camera::Camera()
 	//The projection matrix, representing the lens of the camera, created with FOV, screen aspect ratio, and near and far of the frustum
 	m_projectionTransform = glm::perspective(1.507f, 16.0f / 9.0f, 0.1f, 10000.0f);
 	//View matrix, the inverse of the camera's world transform
-	m_viewTransform = glm::lookAt(glm::vec3(0, 1, 2), glm::vec3(0), glm::vec3(0, 1, 0));
+	m_viewTransform = glm::lookAt(glm::vec3(0, 0, 2), glm::vec3(0), glm::vec3(0, 1, 0));
 	//The global transform, set to the identity matrix
 	m_worldTransform = glm::inverse(m_viewTransform);
 

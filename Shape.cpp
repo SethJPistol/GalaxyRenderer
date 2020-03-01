@@ -34,8 +34,8 @@ void Shape::Draw()
 	}
 
 	//Feed through the global transform to the vertex shader
-	auto uniform_location = glGetUniformLocation(shaderProgramID, "model_matrix");
-	glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m_localTransform));
+	auto uniformLocation = glGetUniformLocation(shaderProgramID, "model_matrix");
+	glUniformMatrix4fv(uniformLocation, 1, false, glm::value_ptr(m_localTransform));
 
 	//Binding and drawing arrays
 	glBindVertexArray(m_VAO);
@@ -270,7 +270,7 @@ Pyramid::Pyramid(int sides, float height, glm::vec3 position, float scale) : Sha
 }
 void Pyramid::CreateMesh()
 {
-	m_vertexAmount = m_sides + 2;	//Cylinder verts is same as two polygons
+	m_vertexAmount = m_sides + 2;	//Cylinder verts is same as a polygon with one extra
 	//Set the vertex positions
 	m_vertices = new Vertex[m_vertexAmount];
 
@@ -302,16 +302,16 @@ void Pyramid::CreateMesh()
 	}
 	m_indexBuffer[(int)(m_sides * 3) - 1] = 1;	//Link the final index along the circle back to the first
 
-	//Index the top polygon
-	int startingIndex = (int)(m_sides * 3);				//Offset the indexes we are writing
+	//Index the sides
+	int startingIndex = (int)(m_sides * 3);		//Offset the indexes we are writing
 	currentTri = 1;
-	for (int i = 0; i < (m_sides * 6); ++i)
+	for (int i = startingIndex; i < (m_sides * 6); ++i)
 	{
-		m_indexBuffer[i + startingIndex] = (m_vertexAmount - 1);
+		m_indexBuffer[i] = (m_vertexAmount - 1);
 		++i;
-		m_indexBuffer[i + startingIndex] = currentTri + 1;
+		m_indexBuffer[i] = currentTri + 1;
 		++i;
-		m_indexBuffer[i + startingIndex] = currentTri;
+		m_indexBuffer[i] = currentTri;
 		++currentTri;
 	}
 	m_indexBuffer[(m_sides * 6) - 2] = 1;	//Link the final index along the circle back to the first

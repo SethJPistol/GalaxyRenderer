@@ -148,6 +148,8 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 
 		m_meshChunks.push_back(chunk);
 	}
+
+	m_localTransform = glm::mat4(1);
 	
 	// load obj
 	return true;
@@ -185,6 +187,10 @@ void OBJMesh::draw(bool usePatches /* = false */) {
 
 	if (m_texture != 0)
 		glBindTexture(GL_TEXTURE_2D, m_texture);
+
+	//Feed through the global transform to the vertex shader
+	auto uniformLocation = glGetUniformLocation(program, "model_matrix");
+	glUniformMatrix4fv(uniformLocation, 1, false, glm::value_ptr(m_localTransform));
 
 	auto ambientUniform = glGetUniformLocation(program, "material_ambient");
 	auto diffuseUniform = glGetUniformLocation(program, "material_diffuse");
@@ -309,6 +315,16 @@ void OBJMesh::draw(bool usePatches /* = false */) {
 
 	if (m_texture != 0)
 		glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void OBJMesh::SetScale(float scale)
+{
+	m_localTransform[0][0] /= m_scale;
+	m_localTransform[0][0] *= scale;
+	m_localTransform[1][1] /= m_scale;
+	m_localTransform[1][1] *= scale;
+	m_localTransform[2][2] /= m_scale;
+	m_localTransform[2][2] *= scale;
 }
 
 void OBJMesh::calculateTangents(std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {

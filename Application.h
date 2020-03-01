@@ -37,10 +37,20 @@ private:
 
 	glm::mat4 m_model;
 	glxy::Camera* m_pCamera;
-	glxy::Sprite* m_pSprite;
+
+	//Shapes
 	glxy::Cube* m_pCube;
+	glxy::Polygon* m_pPoly;
+	glxy::Prism* m_pPrism;
+	glxy::Pyramid* m_pPyramid;
+
+	//Sprites
+	glxy::Sprite* m_pSprite;
+
+	//Models
 	aie::OBJMesh m_soldierModel;
+	aie::OBJMesh m_tentacleModel;
 
+	//Lights
 	std::vector<glxy::DirectionalLight> m_directionalLights;
-
 };
