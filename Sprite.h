@@ -17,7 +17,7 @@ namespace glxy
 		~Sprite();
 		void LoadTexture(const char* texturePath);
 		void LoadTexture(unsigned int textureHandle);
-		void Draw();	//Override to draw the texture, if present
+		void Draw();
 
 		glm::vec3 GetPosition();
 		void SetPosition(glm::vec3 position);
