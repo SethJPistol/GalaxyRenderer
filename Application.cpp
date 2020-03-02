@@ -32,8 +32,10 @@ Application::Application()
 
 	//TEXTURES
 	m_pSprite->LoadTexture("Assets/test.png");
-	m_soldierModel.LoadTexture("Assets\\WinterSoldier\\Textures\\Char_AS_Albedo.png");
-	m_tentacleModel.LoadTexture("Assets\\Tentacle\\Textures\\Tentacle_Albedo.png");
+	m_soldierModel.LoadDiffuse("Assets\\WinterSoldier\\Textures\\Char_AS_Albedo.png");
+	m_soldierModel.LoadNormal("Assets\\WinterSoldier\\Textures\\Char_AS_Normal_DirectX.PNG");
+	m_tentacleModel.LoadDiffuse("Assets\\Tentacle\\Textures\\Tentacle_Albedo.png");
+	m_tentacleModel.LoadNormal("Assets\\Tentacle\\Textures\\Tentacle_Normal.png");
 
 
 	//MATERIALS
@@ -111,14 +113,14 @@ void Application::Run()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear the back buffer every frame, to avoid leftover visuals
 
+		//Update time
 		float currentFrame = (float)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		totalTime += deltaTime;
 
-		//CAMERA MOVEMENT
+		//Update the camera
 		m_pCamera->Update(deltaTime);
-
 		glm::mat4 pv = m_pCamera->GetPV();
 
 
@@ -154,6 +156,7 @@ void Application::Run()
 		m_tentacleModel.draw();
 
 
+		//Cube movement
 		bool inputFlag = false;
 		glm::vec3 displacement = glm::vec3(0);
 		if (glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)

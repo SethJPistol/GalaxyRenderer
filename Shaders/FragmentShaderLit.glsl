@@ -4,6 +4,8 @@
 in vec3 final_normal;
 in vec4 cam_space_position;
 in vec2 final_texture_coordinates;
+in vec3 final_tangent;
+in vec3 final_bitangent;
 
 struct DirectionalLight
 {
@@ -14,6 +16,7 @@ struct DirectionalLight
 };
 
 uniform sampler2D diffuse_texture;
+uniform sampler2D normal_texture;
 
 uniform vec3 camera_position;
 
@@ -24,11 +27,6 @@ uniform vec3 material_ambient;
 uniform vec3 material_diffuse;
 uniform vec3 material_specular;
 uniform float material_specular_power;
-
-//uniform vec3 light_direction;
-//uniform vec3 light_ambient;
-//uniform vec3 light_diffuse;
-//uniform vec3 light_specular;
 
 
 out vec4 final_color;
@@ -41,10 +39,20 @@ void main()
 	//Store the total of all the lights' effect on this frag's colour
 	vec3 result;
 
-	//Make sure the normal is normalised
+	//Make sure the vectors are normalised
 	vec3 normal = normalize(final_normal);
+	vec3 tangent = normalize(final_tangent);
+	vec3 bitangent = normalize(final_bitangent);
+	
 	//Calculate the view vector
 	vec3 view = normalize(camera_position - cam_space_position.xyz);
+	
+	//Create the Tangent Basis Matrix
+	mat3 TBN = mat3(tangent, bitangent, normal);
+	//Get the normal map value at the current texture coordinate
+	vec3 texture_normal = texture(normal_texture, final_texture_coordinates).xyz;
+	//Recalculate the normal using the normal map
+	normal = TBN * (texture_normal * 2 - 1);
 	
 	//For all the directional lights in the scene, calculate their effect
 	for (int i = 0; i < D_LIGHT_AMOUNT; ++i)
@@ -73,7 +81,7 @@ vec3 CalculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 view)
 	vec3 specular = material_specular * light.specular * specular_term;
 	
 	//Get the texture colour at the current texture coordinate
-	vec4 texture_color = texture(diffuse_texture, final_texture_coordinates);
+	vec4 texture_diffuse = texture(diffuse_texture, final_texture_coordinates);
 	
-	return (ambient + (diffuse * texture_color.xyz) + specular);
+	return (ambient + (diffuse * texture_diffuse.xyz) + specular);
 }

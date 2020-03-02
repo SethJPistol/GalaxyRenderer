@@ -155,14 +155,35 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 	return true;
 }
 
-void OBJMesh::LoadTexture(const char* texturePath)
+void OBJMesh::LoadDiffuse(const char* texturePath)
 {
 	int x, y, n;
 	unsigned char* texData = stbi_load(texturePath, &x, &y, &n, 0);
 
-	glGenTextures(1, &m_texture);
-	glBindTexture(GL_TEXTURE_2D, m_texture);
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &m_diffuseTexture);
+	glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
 	
+	if (n == 3)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+	if (n == 4)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+
+	//Generate the mipmaps so the texture can be sampled
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // GL_LINEAR SAMPLES texels
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // GL_NEARESTS RETURNS just closest pixel
+
+	stbi_image_free(texData);
+}
+void OBJMesh::LoadNormal(const char* texturePath)
+{
+	int x, y, n;
+	unsigned char* texData = stbi_load(texturePath, &x, &y, &n, 0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glGenTextures(1, &m_normalTexture);
+	glBindTexture(GL_TEXTURE_2D, m_normalTexture);
+
 	if (n == 3)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
 	if (n == 4)
@@ -185,8 +206,6 @@ void OBJMesh::draw(bool usePatches /* = false */) {
 		return;
 	}
 
-	if (m_texture != 0)
-		glBindTexture(GL_TEXTURE_2D, m_texture);
 
 	//Feed through the global transform to the vertex shader
 	auto uniformLocation = glGetUniformLocation(program, "model_matrix");
@@ -196,6 +215,15 @@ void OBJMesh::draw(bool usePatches /* = false */) {
 	auto diffuseUniform = glGetUniformLocation(program, "material_diffuse");
 	auto specularUniform = glGetUniformLocation(program, "material_specular");
 	auto specPowerUniform = glGetUniformLocation(program, "material_specular_power");
+
+	//Set texture slots
+	int diffuseTexUniform = glGetUniformLocation(program, "diffuse_texture");
+	if (diffuseTexUniform >= 0)
+		glUniform1i(diffuseTexUniform, 0);
+	int normalTexUniform = glGetUniformLocation(program, "normal_texture");
+	if (normalTexUniform >= 0)
+		glUniform1i(normalTexUniform, 1);
+
 
 	// pull uniforms from the shader
 	//int kaUniform = glGetUniformLocation(program, "Ka");
@@ -244,7 +272,18 @@ void OBJMesh::draw(bool usePatches /* = false */) {
 		if (specPowerUniform >= 0)
 			glUniform1f(specPowerUniform, m_materials[0].specularPower);
 
+		//Bind textures
+		glActiveTexture(GL_TEXTURE0);
+		if (m_diffuseTexture >= 0)
+			glBindTexture(GL_TEXTURE_2D, m_diffuseTexture);
+		else
+			glBindTexture(GL_TEXTURE_2D, 0);
 
+		glActiveTexture(GL_TEXTURE1);
+		if (m_normalTexture >= 0)
+			glBindTexture(GL_TEXTURE_2D, m_normalTexture);
+		else
+			glBindTexture(GL_TEXTURE_2D, 0);
 		// bind material
 		//if (currentMaterial != c.materialID) 
 		//{
@@ -313,7 +352,7 @@ void OBJMesh::draw(bool usePatches /* = false */) {
 			glDrawElements(GL_TRIANGLES, c.indexCount, GL_UNSIGNED_INT, 0);
 	}
 
-	if (m_texture != 0)
+	if (m_diffuseTexture >= 0)
 		glBindTexture(GL_TEXTURE_2D, 0);
 }
 

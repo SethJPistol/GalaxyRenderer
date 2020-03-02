@@ -35,14 +35,6 @@ public:
 
 		float specularPower;
 		float opacity;
-
-		//Texture diffuseTexture;				// bound slot 0
-		//Texture alphaTexture;				// bound slot 1
-		//Texture ambientTexture;				// bound slot 2
-		//Texture specularTexture;			// bound slot 3
-		//Texture specularHighlightTexture;	// bound slot 4
-		//Texture normalTexture;				// bound slot 5
-		//Texture displacementTexture;		// bound slot 6
 	};
 
 	OBJMesh() {}
@@ -52,7 +44,8 @@ public:
 	bool load(const char* filename, bool loadTextures = true, bool flipTextureV = false);
 
 	//Loads a texture and binds it
-	void LoadTexture(const char* texturePath);
+	void LoadDiffuse(const char* texturePath);
+	void LoadNormal(const char* texturePath);
 
 	// allow option to draw as patches for tessellation
 	void draw(bool usePatches = false);
@@ -84,7 +77,8 @@ private:
 	std::string				m_filename;
 	std::vector<MeshChunk>	m_meshChunks;
 
-	unsigned int m_texture = 0;
+	unsigned int m_diffuseTexture = 0;
+	unsigned int m_normalTexture = 0;
 
 	glm::mat4 m_localTransform;
 	float m_scale = 1.0f;

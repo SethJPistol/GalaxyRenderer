@@ -36,9 +36,14 @@ void Sprite::LoadTexture(const char* texturePath)
 	int x, y, n;
 	unsigned char* texData = stbi_load(texturePath, &x, &y, &n, 0);
 
+	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &m_texture);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+
+	if (n == 3)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+	if (n == 4)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
 
 	//Generate the mipmaps so the texture can be sampled
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // GL_LINEAR SAMPLES texels
@@ -49,6 +54,7 @@ void Sprite::LoadTexture(const char* texturePath)
 
 void Sprite::Draw()
 {
+	glActiveTexture(GL_TEXTURE0);
 	if (m_texture != 0)
 		glBindTexture(GL_TEXTURE_2D, m_texture);
 
