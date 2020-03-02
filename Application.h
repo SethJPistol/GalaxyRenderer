@@ -7,9 +7,10 @@
 #include "Camera.h"
 #include "Shape.h"
 #include "Sprite.h"
-#include "ShaderProgram.h"
 #include "Dependencies\OBJMesh.h"
 #include "Light.h"
+#include "ShaderProgram.h"
+#include "RenderTarget.h"
 
 class Application
 {
@@ -35,6 +36,8 @@ private:
 	bool m_running;
 	GLFWwindow* m_window;
 
+	glxy::RenderTarget* m_pRenderTarget;
+
 	glm::mat4 m_model;
 	glxy::Camera* m_pCamera;
 
@@ -46,6 +49,7 @@ private:
 
 	//Sprites
 	glxy::Sprite* m_pSprite;
+	glxy::Sprite* m_pRTSprite;
 
 	//Models
 	aie::OBJMesh m_soldierModel;

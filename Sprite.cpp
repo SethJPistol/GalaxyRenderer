@@ -51,6 +51,10 @@ void Sprite::LoadTexture(const char* texturePath)
 
 	stbi_image_free(texData);
 }
+void Sprite::LoadTexture(unsigned int textureHandle)
+{
+	m_texture = textureHandle;
+}
 
 void Sprite::Draw()
 {
@@ -121,10 +125,10 @@ void Sprite::CreateMesh()
 	m_vertices[3].position = glm::vec3(0.5f, -0.5f, 0.0f);
 
 	//Set the vertex UVs
-	m_vertices[0].UV = glm::vec2(0.0f, 0.0f);
-	m_vertices[1].UV = glm::vec2(1.0f, 0.0f);
-	m_vertices[2].UV = glm::vec2(0.0f, 1.0f);
-	m_vertices[3].UV = glm::vec2(1.0f, 1.0f);
+	m_vertices[0].UV = glm::vec2(0.0f, 1.0f);
+	m_vertices[1].UV = glm::vec2(1.0f, 1.0f);
+	m_vertices[2].UV = glm::vec2(0.0f, 0.0f);
+	m_vertices[3].UV = glm::vec2(1.0f, 0.0f);
 
 	//Create the tris
 	m_indexAmount = 6;

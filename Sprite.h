@@ -16,6 +16,7 @@ namespace glxy
 		Sprite(glm::vec3 position = glm::vec3(0), float scale = 1.0f);
 		~Sprite();
 		void LoadTexture(const char* texturePath);
+		void LoadTexture(unsigned int textureHandle);
 		void Draw();	//Override to draw the texture, if present
 
 		glm::vec3 GetPosition();

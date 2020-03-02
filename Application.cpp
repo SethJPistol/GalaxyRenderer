@@ -14,6 +14,14 @@ Application::Application()
 		return;
 	}
 
+
+	//RENDER TARGETS
+	int width;
+	int height;
+	glfwGetWindowSize(m_window, &width, &height);
+	m_pRenderTarget = new glxy::RenderTarget(1, width, height);
+
+
 	//MESHES
 	m_pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
 	m_pPoly = new glxy::Polygon(5, glm::vec3(-5.0f, 0.0f, 0.0f));
@@ -21,6 +29,7 @@ Application::Application()
 	m_pPyramid = new glxy::Pyramid(8, 2, glm::vec3(-10.0f, 0.0f, 0.0f));
 
 	m_pSprite = new glxy::Sprite(glm::vec3(5.0f, 0.0f, 0.0f));
+	m_pRTSprite = new glxy::Sprite(glm::vec3(7.0f, 0.0f, 0.0f));
 
 	bool loaded = m_soldierModel.load("Assets\\WinterSoldier\\Model\\CharAS.obj", false, true);	//Final value true so the UVs are flipped vertically
 	m_soldierModel.SetPosition(glm::vec3(0.0f, -2.0f, 0.0f));
@@ -32,6 +41,7 @@ Application::Application()
 
 	//TEXTURES
 	m_pSprite->LoadTexture("Assets/test.png");
+	m_pRTSprite->LoadTexture(m_pRenderTarget->GetTarget(0));
 	m_soldierModel.LoadDiffuse("Assets\\WinterSoldier\\Textures\\Char_AS_Albedo.png");
 	m_soldierModel.LoadNormal("Assets\\WinterSoldier\\Textures\\Char_AS_Normal_DirectX.PNG");
 	m_tentacleModel.LoadDiffuse("Assets\\Tentacle\\Textures\\Tentacle_Albedo.png");
@@ -97,7 +107,11 @@ Application::~Application()
 	delete m_pPoly;
 	delete m_pPrism;
 	delete m_pPyramid;
+
 	delete m_pSprite;
+	delete m_pRTSprite;
+
+	delete m_pRenderTarget;
 
 	glfwDestroyWindow(m_window);
 	glfwTerminate();	//Terminate GLFW
@@ -141,6 +155,9 @@ void Application::Run()
 		m_pSprite->Draw();
 
 
+		m_pRenderTarget->Bind();	//Render the following things to the render target
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear the render target from last frame
+
 		//Object drawing
 		pLitShader->UseProgram();	//Bind the shaders
 		pLitShader->SetUniform("projection_view_matrix", pv);
@@ -154,6 +171,14 @@ void Application::Run()
 
 		m_soldierModel.draw();
 		m_tentacleModel.draw();
+
+		m_pRenderTarget->Unbind();	//Return to drawing to the back buffer
+
+
+		//RTSprite drawing
+		pSpriteShader->UseProgram();	//Bind the shaders
+		pSpriteShader->SetUniform("projection_view_matrix", pv);
+		m_pRTSprite->Draw();
 
 
 		//Cube movement

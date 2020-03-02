@@ -155,6 +155,7 @@
     <ClCompile Include="Dependencies\glcore\gl_core_4_5.c" />
     <ClCompile Include="Dependencies\OBJMesh.cpp" />
     <ClCompile Include="Light.cpp" />
+    <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="Source.cpp">
@@ -168,6 +169,7 @@
     <ClInclude Include="Dependencies\OBJMesh.h" />
     <ClInclude Include="Dependencies\tiny_obj_loader.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="RenderTarget.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Sprite.h" />
