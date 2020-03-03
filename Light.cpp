@@ -10,7 +10,7 @@ using namespace glxy;
 
 Light::Light()
 {
-	ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+	ambient = glm::vec3(0.25f, 0.25f, 0.25f);
 	diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
 	specular = glm::vec3(1.0f, 1.0f, 1.0f);
 }

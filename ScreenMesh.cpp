@@ -10,11 +10,24 @@ using namespace glxy;
 
 ScreenMesh::ScreenMesh()
 {
-
+	CreateMesh();
+	LoadMesh();
+}
+ScreenMesh::ScreenMesh(unsigned int textureHandle)
+{
+	CreateMesh();
+	LoadMesh();
+	LoadTexture(textureHandle);
 }
 ScreenMesh::~ScreenMesh()
 {
+	//Clearing memory
+	glDeleteBuffers(1, &m_VAO);
+	glDeleteBuffers(1, &m_VBO);
+	glDeleteTextures(1, &m_screenTexture);
 
+	delete[] m_vertices;
+	delete[] m_indexBuffer;
 }
 
 void ScreenMesh::LoadTexture(unsigned int textureHandle)
@@ -37,10 +50,6 @@ void ScreenMesh::Draw()
 		return;
 	}
 
-	//Feed through the global transform to the vertex shader
-	auto uniform_location = glGetUniformLocation(shaderProgramID, "model_matrix");
-	//glUniformMatrix4fv(uniform_location, 1, false, glm::value_ptr(m_localTransform));
-
 	//Binding and drawing arrays
 	glBindVertexArray(m_VAO);
 	glDrawElements(GL_TRIANGLES, m_indexAmount, GL_UNSIGNED_INT, 0);	//Used for drawing using the IBO
@@ -59,12 +68,6 @@ void ScreenMesh::CreateMesh()
 	m_vertices[1].position = glm::vec2(1, 1);
 	m_vertices[2].position = glm::vec2(-1, -1);
 	m_vertices[3].position = glm::vec2(1, -1);
-
-	//Set the vertex UVs
-	m_vertices[0].UV = glm::vec2(0.0f, 1.0f);
-	m_vertices[1].UV = glm::vec2(1.0f, 1.0f);
-	m_vertices[2].UV = glm::vec2(0.0f, 0.0f);
-	m_vertices[3].UV = glm::vec2(1.0f, 0.0f);
 
 	//Create the tris
 	m_indexAmount = 6;
@@ -94,8 +97,6 @@ void ScreenMesh::LoadMesh()
 	//Set the attributes of each vertex
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(glm::vec2));
 
 	//Unbind the array and buffers for safety
 	glBindVertexArray(0);

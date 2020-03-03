@@ -11,10 +11,10 @@ namespace glxy
 		struct Vertex
 		{
 			glm::vec2 position;
-			glm::vec2 UV;
 		};
 
 		ScreenMesh();
+		ScreenMesh(unsigned int textureHandle);
 		~ScreenMesh();
 
 		void LoadTexture(unsigned int textureHandle);

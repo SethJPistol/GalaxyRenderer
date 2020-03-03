@@ -1,7 +1,6 @@
 #include "Application.h"
 
-#include <fstream>	//For strings and other stuff
-#include <sstream>
+#include "stb_image.h"
 
 Application::Application()
 {
@@ -15,33 +14,37 @@ Application::Application()
 	}
 
 
-	//RENDER TARGETS
-	int width;
-	int height;
-	glfwGetWindowSize(m_window, &width, &height);
-	m_pRenderTarget = new glxy::RenderTarget(1, width, height);
+	//POST-PROCESSING (ironically, coming first in the initialisation steps)
+	if (m_usePostProcessing)
+	{
+		int width;
+		int height;
+		glfwGetWindowSize(m_window, &width, &height);
+		m_pRenderTarget = new glxy::RenderTarget(1, width, height);
+
+		m_pScreen = new glxy::ScreenMesh(m_pRenderTarget->GetTarget(0));
+	}
 
 
 	//MESHES
 	m_pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
-	m_pPoly = new glxy::Polygon(5, glm::vec3(-5.0f, 0.0f, 0.0f));
-	m_pPrism = new glxy::Prism(6, 2, glm::vec3(-7.5f, 0.0f, 0.0f));
-	m_pPyramid = new glxy::Pyramid(8, 2, glm::vec3(-10.0f, 0.0f, 0.0f));
+	m_pPoly = new glxy::Polygon(5, glm::vec3(-5.0f, -0.5f, 0.0f));
+	m_pPrism = new glxy::Prism(6, 2, glm::vec3(-7.5f, 0.5f, 0.0f));
+	m_pPyramid = new glxy::Pyramid(8, 2, glm::vec3(-10.0f, 0.5f, 0.0f));
 
 	m_pSprite = new glxy::Sprite(glm::vec3(5.0f, 0.0f, 0.0f));
-	m_pRTSprite = new glxy::Sprite(glm::vec3(7.0f, 0.0f, 0.0f));
 
-	bool loaded = m_soldierModel.load("Assets\\WinterSoldier\\Model\\CharAS.obj", false, true);	//Final value true so the UVs are flipped vertically
-	m_soldierModel.SetPosition(glm::vec3(0.0f, -2.0f, 0.0f));
+	bool loaded = m_soldierModel.load("Assets\\WinterSoldier\\Model\\CharAS.obj");
+	m_soldierModel.SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
 	m_soldierModel.SetScale(0.1f);
-	bool loaded2 = m_tentacleModel.load("Assets\\Tentacle\\Model\\Tentacle.obj", false, true);
-	m_tentacleModel.SetPosition(glm::vec3(3.0f, -2.0f, 0.0f));
+	bool loaded2 = m_tentacleModel.load("Assets\\Tentacle\\Model\\Tentacle.obj");
+	m_tentacleModel.SetPosition(glm::vec3(3.0f, -0.5f, 0.0f));
 	m_tentacleModel.SetScale(0.01f);
 
 
 	//TEXTURES
+	stbi_set_flip_vertically_on_load(true);	//Make sure that all the textures' UVs are flipped vertically to work with OGL
 	m_pSprite->LoadTexture("Assets/test.png");
-	m_pRTSprite->LoadTexture(m_pRenderTarget->GetTarget(0));
 	m_soldierModel.LoadDiffuse("Assets\\WinterSoldier\\Textures\\Char_AS_Albedo.png");
 	m_soldierModel.LoadNormal("Assets\\WinterSoldier\\Textures\\Char_AS_Normal_DirectX.PNG");
 	m_tentacleModel.LoadDiffuse("Assets\\Tentacle\\Textures\\Tentacle_Albedo.png");
@@ -62,26 +65,28 @@ Application::Application()
 
 	//CAMERA
 	m_model = glm::mat4(1);
-	m_pCamera = new glxy::Camera();
+	m_pCamera = new glxy::Camera(glm::vec3(0, 2, 4), glm::vec3(0, 1, 0));
 
 
 	//SHADERS
 	pShapeShader = new glxy::ShaderProgram("Shaders\\VertexShaderBasic.glsl", "Shaders\\FragmentShaderBasic.glsl");
 	pSpriteShader = new glxy::ShaderProgram("Shaders\\VertexShaderSprite.glsl", "Shaders\\FragmentShaderSprite.glsl");
 	pLitShader = new glxy::ShaderProgram("Shaders\\VertexShaderLit.glsl", "Shaders\\FragmentShaderLit.glsl");
+	if (m_usePostProcessing)
+		pPostProcShader = new glxy::ShaderProgram("Shaders\\VertexShaderPostProc.glsl", "Shaders\\FragmentShaderPostProc.glsl");
 
 
 	//LIGHTING
 	m_directionalLights.push_back(glxy::DirectionalLight());
 	m_directionalLights[0].direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	m_directionalLights[0].ambient = glm::vec3(0.0f, 0.2f, 0.0f);
-	m_directionalLights[0].diffuse = glm::vec3(0.5f, 1.0f, 0.5f);
-	m_directionalLights[0].specular = glm::vec3(0.2f, 0.7f, 0.2f);
+	//m_directionalLights[0].ambient = glm::vec3(0.0f, 0.2f, 0.0f);
+	//m_directionalLights[0].diffuse = glm::vec3(0.5f, 1.0f, 0.5f);
+	//m_directionalLights[0].specular = glm::vec3(0.2f, 0.7f, 0.2f);
 	m_directionalLights.push_back(glxy::DirectionalLight());
 	m_directionalLights[1].direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	m_directionalLights[1].ambient = glm::vec3(0.2f, 0.0f, 0.0f);
-	m_directionalLights[1].diffuse = glm::vec3(1.0f, 0.7f, 0.7f);
-	m_directionalLights[1].specular = glm::vec3(0.7f, 0.2f, 0.2f);
+	//m_directionalLights[1].ambient = glm::vec3(0.2f, 0.0f, 0.0f);
+	//m_directionalLights[1].diffuse = glm::vec3(1.0f, 0.7f, 0.7f);
+	//m_directionalLights[1].specular = glm::vec3(0.7f, 0.2f, 0.2f);
 
 
 	//RENDER SETTINGS
@@ -101,6 +106,7 @@ Application::~Application()
 	delete pShapeShader;
 	delete pSpriteShader;
 	delete pLitShader;
+	delete pPostProcShader;
 
 	delete m_pCamera;
 	delete m_pCube;
@@ -109,9 +115,9 @@ Application::~Application()
 	delete m_pPyramid;
 
 	delete m_pSprite;
-	delete m_pRTSprite;
 
 	delete m_pRenderTarget;
+	delete m_pScreen;
 
 	glfwDestroyWindow(m_window);
 	glfwTerminate();	//Terminate GLFW
@@ -138,6 +144,13 @@ void Application::Run()
 		glm::mat4 pv = m_pCamera->GetPV();
 
 
+		if (m_usePostProcessing)
+		{
+			m_pRenderTarget->Bind();	//Render the following things to the render target
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear the render target from last frame
+		}
+
+
 		//Shape drawing
 		glm::vec4 color = glm::vec4(0.3f, 0.3f, 0.85f, 1.0f);
 		pShapeShader->UseProgram();	//Bind the shaders
@@ -155,9 +168,6 @@ void Application::Run()
 		m_pSprite->Draw();
 
 
-		m_pRenderTarget->Bind();	//Render the following things to the render target
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear the render target from last frame
-
 		//Object drawing
 		pLitShader->UseProgram();	//Bind the shaders
 		pLitShader->SetUniform("projection_view_matrix", pv);
@@ -172,13 +182,16 @@ void Application::Run()
 		m_soldierModel.draw();
 		m_tentacleModel.draw();
 
-		m_pRenderTarget->Unbind();	//Return to drawing to the back buffer
 
+		if (m_usePostProcessing)
+		{
+			m_pRenderTarget->Unbind();	//Return to drawing to the back buffer
 
-		//RTSprite drawing
-		pSpriteShader->UseProgram();	//Bind the shaders
-		pSpriteShader->SetUniform("projection_view_matrix", pv);
-		m_pRTSprite->Draw();
+			//Draw the render target to the back buffer now
+			pPostProcShader->UseProgram();
+			pPostProcShader->SetUniform("chromatic_aberration_amount", 1.0f);
+			m_pScreen->Draw();
+		}
 
 
 		//Cube movement

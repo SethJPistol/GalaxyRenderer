@@ -31,7 +31,7 @@ RenderTarget::RenderTarget(unsigned int targetCount, unsigned int width, unsigne
 
 		std::vector<GLenum> drawBuffers = {};
 
-		for (unsigned int i = 0; i < targetCount; ++i) 
+		for (unsigned int i = 0; i < targetCount; ++i)
 		{
 			m_targets[i] = CreateTexture(width, height);
 
@@ -97,8 +97,9 @@ unsigned int RenderTarget::CreateTexture(unsigned int width, unsigned int height
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	//Generate the mipmaps so the texture can be sampled
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	//Set to linear so that the sampling doesn't pixelate due to floating point error
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

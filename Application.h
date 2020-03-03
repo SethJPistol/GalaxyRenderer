@@ -11,6 +11,7 @@
 #include "Light.h"
 #include "ShaderProgram.h"
 #include "RenderTarget.h"
+#include "ScreenMesh.h"
 
 class Application
 {
@@ -24,6 +25,7 @@ public:
 	glxy::ShaderProgram* pShapeShader = nullptr;
 	glxy::ShaderProgram* pSpriteShader = nullptr;
 	glxy::ShaderProgram* pLitShader = nullptr;
+	glxy::ShaderProgram* pPostProcShader = nullptr;
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
@@ -36,7 +38,10 @@ private:
 	bool m_running;
 	GLFWwindow* m_window;
 
-	glxy::RenderTarget* m_pRenderTarget;
+	//Post-processing
+	glxy::RenderTarget* m_pRenderTarget = nullptr;
+	glxy::ScreenMesh* m_pScreen = nullptr;
+	bool m_usePostProcessing = true;
 
 	glm::mat4 m_model;
 	glxy::Camera* m_pCamera;
@@ -49,7 +54,6 @@ private:
 
 	//Sprites
 	glxy::Sprite* m_pSprite;
-	glxy::Sprite* m_pRTSprite;
 
 	//Models
 	aie::OBJMesh m_soldierModel;

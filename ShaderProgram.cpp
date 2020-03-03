@@ -80,22 +80,52 @@ void ShaderProgram::UseProgram()
 void ShaderProgram::SetUniform(const char* uniformName, glm::mat4 value)
 {
 	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
+	if (uniformLocation == -1)
+	{
+		printf("Error - Shader uniform not found when trying to set mat4\n");
+		return;
+	}
 	glUniformMatrix4fv(uniformLocation, 1, false, glm::value_ptr(value));
 }
 void ShaderProgram::SetUniform(const char* uniformName, glm::mat3 value)
 {
 	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
+	if (uniformLocation == -1)
+	{
+		printf("Error - Shader uniform not found when trying to set mat3\n");
+		return;
+	}
 	glUniformMatrix3fv(uniformLocation, 1, false, glm::value_ptr(value));
 }
 void ShaderProgram::SetUniform(const char* uniformName, glm::vec4 value)
 {
 	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
+	if (uniformLocation == -1)
+	{
+		printf("Error - Shader uniform not found when trying to set vec4\n");
+		return;
+	}
 	glUniform4fv(uniformLocation, 1, glm::value_ptr(value));
 }
 void ShaderProgram::SetUniform(const char* uniformName, glm::vec3 value)
 {
 	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
+	if (uniformLocation == -1)
+	{
+		printf("Error - Shader uniform not found when trying to set vec3\n");
+		return;
+	}
 	glUniform3fv(uniformLocation, 1, glm::value_ptr(value));
+}
+void ShaderProgram::SetUniform(const char* uniformName, float value)
+{
+	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
+	if (uniformLocation == -1)
+	{
+		printf("Error - Shader uniform not found when trying to set float\n");
+		return;
+	}
+	glUniform1f(uniformLocation, value);
 }
 
 void ShaderProgram::ShaderCompileCheck(unsigned int shaderID, const char* errorMessage)
