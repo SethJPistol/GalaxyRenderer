@@ -14,18 +14,6 @@ Application::Application()
 	}
 
 
-	//POST-PROCESSING (ironically, coming first in the initialisation steps)
-	if (m_usePostProcessing)
-	{
-		int width;
-		int height;
-		glfwGetWindowSize(m_window, &width, &height);
-		m_pRenderTarget = new glxy::RenderTarget(1, width, height);
-
-		m_pScreen = new glxy::ScreenMesh(m_pRenderTarget->GetTarget(0));
-	}
-
-
 	//MESHES
 	m_pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
 	m_pPoly = new glxy::Polygon(5, glm::vec3(-5.0f, -0.5f, 0.0f));
@@ -79,14 +67,26 @@ Application::Application()
 	//LIGHTING
 	m_directionalLights.push_back(glxy::DirectionalLight());
 	m_directionalLights[0].direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	//m_directionalLights[0].ambient = glm::vec3(0.0f, 0.2f, 0.0f);
-	//m_directionalLights[0].diffuse = glm::vec3(0.5f, 1.0f, 0.5f);
-	//m_directionalLights[0].specular = glm::vec3(0.2f, 0.7f, 0.2f);
+	m_directionalLights[0].ambient = glm::vec3(0.0f, 0.2f, 0.0f);
+	m_directionalLights[0].diffuse = glm::vec3(0.5f, 1.0f, 0.5f);
+	m_directionalLights[0].specular = glm::vec3(0.2f, 0.7f, 0.2f);
 	m_directionalLights.push_back(glxy::DirectionalLight());
 	m_directionalLights[1].direction = glm::vec3(-1.0f, 0.0f, 0.0f);
-	//m_directionalLights[1].ambient = glm::vec3(0.2f, 0.0f, 0.0f);
-	//m_directionalLights[1].diffuse = glm::vec3(1.0f, 0.7f, 0.7f);
-	//m_directionalLights[1].specular = glm::vec3(0.7f, 0.2f, 0.2f);
+	m_directionalLights[1].ambient = glm::vec3(0.2f, 0.0f, 0.0f);
+	m_directionalLights[1].diffuse = glm::vec3(1.0f, 0.7f, 0.7f);
+	m_directionalLights[1].specular = glm::vec3(0.7f, 0.2f, 0.2f);
+
+
+	//POST-PROCESSING
+	if (m_usePostProcessing)
+	{
+		int width;
+		int height;
+		glfwGetWindowSize(m_window, &width, &height);
+		m_pRenderTarget = new glxy::RenderTarget(1, width, height);
+
+		m_pScreen = new glxy::ScreenMesh(m_pRenderTarget->GetTarget(0));
+	}
 
 
 	//RENDER SETTINGS
@@ -187,8 +187,20 @@ void Application::Run()
 		{
 			m_pRenderTarget->Unbind();	//Return to drawing to the back buffer
 
+			//Let the user change the effect during runtime
+			if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS && !m_EKeyHeld)
+			{
+				++m_effectToUse;
+				if (m_effectToUse == PP_EFFECT_COUNT)
+					m_effectToUse = 0;
+				m_EKeyHeld = true;
+			}
+			else if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_RELEASE && m_EKeyHeld)
+				m_EKeyHeld = false;
+
 			//Draw the render target to the back buffer now
 			pPostProcShader->UseProgram();
+			pPostProcShader->SetUniform("effect_to_use", m_effectToUse);
 			pPostProcShader->SetUniform("chromatic_aberration_amount", 1.0f);
 			m_pScreen->Draw();
 		}

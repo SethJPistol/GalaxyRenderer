@@ -4,6 +4,7 @@ in vec2 final_texture_coordinates;
 
 uniform sampler2D diffuse_texture;
 
+uniform int effect_to_use = 0;
 uniform float chromatic_aberration_amount = 1.0f;
 
 out vec4 final_color;
@@ -26,7 +27,20 @@ void main()
 	vec2 scale = (texture_size - texel_size) / texture_size;
 	vec2 tex_coord = final_texture_coordinates / scale + texel_size * 0.5f;
 	
-	final_color = ChromaticAberrationCentered(tex_coord, texel_size);
+	//Check which effect to use and apply
+	vec4 result;
+	if (effect_to_use == 0)
+		result = Default(tex_coord);
+	if (effect_to_use == 1)
+		result = Tint(tex_coord, vec3(0.9f, 0.7f, 0.7f));
+	if (effect_to_use == 2)
+		result = Sepia(tex_coord);
+	if (effect_to_use == 3)
+		result = ChromaticAberration(tex_coord, texel_size);
+	if (effect_to_use == 4)
+		result = ChromaticAberrationCentered(tex_coord, texel_size);
+	
+	final_color = result;
 }
 
 vec4 Default(vec2 tex_coord)

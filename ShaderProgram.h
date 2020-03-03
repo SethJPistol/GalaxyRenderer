@@ -19,6 +19,7 @@ namespace glxy
 		void SetUniform(const char* uniformName, glm::vec4 value);
 		void SetUniform(const char* uniformName, glm::vec3 value);
 		void SetUniform(const char* uniformName, float value);
+		void SetUniform(const char* uniformName, int value);
 
 	private:
 

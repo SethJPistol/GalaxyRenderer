@@ -127,6 +127,16 @@ void ShaderProgram::SetUniform(const char* uniformName, float value)
 	}
 	glUniform1f(uniformLocation, value);
 }
+void ShaderProgram::SetUniform(const char* uniformName, int value)
+{
+	auto uniformLocation = glGetUniformLocation(m_shaderProgramID, uniformName);
+	if (uniformLocation == -1)
+	{
+		printf("Error - Shader uniform not found when trying to set int\n");
+		return;
+	}
+	glUniform1i(uniformLocation, value);
+}
 
 void ShaderProgram::ShaderCompileCheck(unsigned int shaderID, const char* errorMessage)
 {

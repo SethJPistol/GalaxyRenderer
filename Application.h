@@ -13,6 +13,8 @@
 #include "RenderTarget.h"
 #include "ScreenMesh.h"
 
+#define PP_EFFECT_COUNT 5
+
 class Application
 {
 public:
@@ -42,6 +44,8 @@ private:
 	glxy::RenderTarget* m_pRenderTarget = nullptr;
 	glxy::ScreenMesh* m_pScreen = nullptr;
 	bool m_usePostProcessing = true;
+	int m_effectToUse = 0;
+	bool m_EKeyHeld = false;
 
 	glm::mat4 m_model;
 	glxy::Camera* m_pCamera;
