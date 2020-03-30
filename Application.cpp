@@ -16,9 +16,10 @@ Application::Application()
 
 	//MESHES
 	m_pQuad = new glxy::Quad(glm::vec3(-2.0f, 0.0f, 0.0f), 1.0f, glm::vec2(0.0f, 0.5f));
-	m_pQuad2 = new glxy::Quad(glm::vec3(-2.0f, 8.0f, 0.0f), 1.0f, glm::vec2(0.0f, -0.5f));
-	m_pCircle = new glxy::Circle(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, glm::vec2(0.5f, 0.0f), 1.0f);
-	m_pCircle2 = new glxy::Circle(glm::vec3(7.0f, 0.0f, 0.0f), 1.0f, glm::vec2(-0.0f, 0.0f), 1.0f);
+	m_pQuad2 = new glxy::Quad(glm::vec3(-2.0f, 3.0f, 0.0f), 1.0f, glm::vec2(0.0f, -0.5f));
+	m_pCircle = new glxy::Circle(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, glm::vec2(0.5f, -0.5f), 1.0f);
+	m_pCircle2 = new glxy::Circle(glm::vec3(4.0f, 0.0f, 0.0f), 1.0f, glm::vec2(-0.0f, 0.0f), 1.0f);
+	m_pPlane = new glxy::Plane(glm::vec2(0.0f, 1.0f), -2.0f);
 	m_pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
 	m_pPoly = new glxy::Polygon(5, glm::vec3(-5.0f, -0.5f, 0.0f));
 	m_pPrism = new glxy::Prism(6, 2, glm::vec3(-7.5f, 0.5f, 0.0f));
@@ -111,6 +112,7 @@ Application::Application()
 	m_pPhysicsScene->AddObject(m_pQuad2);
 	m_pPhysicsScene->AddObject(m_pCircle);
 	m_pPhysicsScene->AddObject(m_pCircle2);
+	m_pPhysicsScene->AddObject(m_pPlane);
 
 
 	m_running = true;
@@ -129,6 +131,7 @@ Application::~Application()
 	delete m_pQuad2;
 	delete m_pCircle;
 	delete m_pCircle2;
+	delete m_pPlane;
 	delete m_pCube;
 	delete m_pPoly;
 	delete m_pPrism;
@@ -161,8 +164,13 @@ void Application::Run()
 		lastFrame = currentFrame;
 		totalTime += deltaTime;
 
+		//Check to turn on physics
+		if (glfwGetKey(m_window, GLFW_KEY_T) == GLFW_PRESS && !m_physicsRunning)
+			m_physicsRunning = true;
+
 		//Update physics
-		m_pPhysicsScene->Update(deltaTime);
+		if (m_physicsRunning)
+			m_pPhysicsScene->Update(deltaTime);
 
 		//Update the camera
 		m_pCamera->Update(deltaTime);
@@ -186,7 +194,8 @@ void Application::Run()
 		m_pQuad2->Draw();
 		m_pCircle->Draw();
 		m_pCircle2->Draw();
-		m_pPoly->Draw();
+		m_pPlane->Draw();
+		//m_pPoly->Draw();
 		//m_pPrism->Draw();
 		//m_pPyramid->Draw();
 

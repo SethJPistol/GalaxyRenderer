@@ -226,17 +226,6 @@ Circle::Circle(glm::vec3 position, float scale, glm::vec2 velocity, float mass)
 {
 	m_radius = m_scale;
 }
-bool Circle::CheckCollision(PhysicsObject* pOther)
-{
-	Circle* pCircle = dynamic_cast<Circle*>(pOther);
-	if (pCircle != nullptr)
-	{
-		float distance = glm::distance(m_position, pCircle->RigidBody::GetPosition());
-		if (distance < (m_radius + pCircle->GetRadius()))
-			return true;	//return glm::normalize(distance) * (m_radius + pCircle->GetRadius());
-	}
-	return false;
-}
 void Circle::SetScale(float scale)
 {
 	Shape::SetScale(scale);

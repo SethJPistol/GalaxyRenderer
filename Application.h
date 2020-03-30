@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Shape.h"
 #include "Sprite.h"
+#include "Plane.h"
 #include "Dependencies\OBJMesh.h"
 #include "Light.h"
 #include "ShaderProgram.h"
@@ -43,6 +44,7 @@ private:
 
 	//Physics
 	PhysicsScene* m_pPhysicsScene = nullptr;
+	bool m_physicsRunning = false;
 
 	//Post-processing
 	glxy::RenderTarget* m_pRenderTarget = nullptr;
@@ -59,6 +61,7 @@ private:
 	glxy::Quad* m_pQuad2;
 	glxy::Circle* m_pCircle;
 	glxy::Circle* m_pCircle2;
+	glxy::Plane* m_pPlane;
 	glxy::Cube* m_pCube;
 	glxy::Polygon* m_pPoly;
 	glxy::Prism* m_pPrism;

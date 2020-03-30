@@ -12,8 +12,6 @@ public:
 	void ApplyForce(glm::vec2 force);
 	void ApplyForceToObject(RigidBody* pObject, glm::vec2 force);
 
-	virtual bool CheckCollision(PhysicsObject* pOther) = 0;
-
 	glm::vec2 GetPosition();
 	glm::vec2 GetVelocity();
 	float GetMass();

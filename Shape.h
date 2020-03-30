@@ -94,7 +94,6 @@ namespace glxy
 				glm::vec2 velocity = glm::vec2(0),
 				float mass = 1.0f);
 
-		virtual bool CheckCollision(PhysicsObject* pOther);
 		void SetScale(float scale);
 		float GetRadius();
 

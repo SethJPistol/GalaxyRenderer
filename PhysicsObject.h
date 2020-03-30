@@ -3,6 +3,8 @@
 #include "glm.hpp"
 #include <functional>
 
+#define SHAPE_AMOUNT 3
+
 enum class ShapeType : char
 {
 	CIRCLE = 0,
@@ -19,5 +21,6 @@ protected:
 
 public:
 	virtual void FixedUpdate(glm::vec2 gravity, float timeStep) = 0;
+	ShapeType GetShapeType() { return m_shape; }
 };
 

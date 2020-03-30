@@ -1,21 +1,42 @@
 #pragma once
 #include "PhysicsObject.h"
 
-class Plane : public PhysicsObject
+namespace glxy
 {
-public:
-	Plane(glm::vec2 normal = glm::vec2(0.0f, 1.0f), float distance = 1.0f);
-	~Plane();
+	class Plane : public PhysicsObject
+	{
+	public:
 
-	virtual void FixedUpdate(glm::vec2 gravity, float timeStep);
+		struct Vertex
+		{
+			glm::vec3 position;
+		};
 
-	void Draw();
+		Plane(glm::vec2 normal = glm::vec2(0.0f, 1.0f), float distance = -1.0f);
+		~Plane();
 
-	glm::vec2 GetNormal();
-	float GetDistance();
+		void CreateMesh();
+		void LoadMesh();
 
-protected:
-	glm::vec2 m_normal;
-	float m_distance;
-};
+		virtual void FixedUpdate(glm::vec2 gravity, float timeStep);
+
+		void Draw();
+
+		glm::vec2 GetNormal();
+		float GetDistance();
+
+	protected:
+		glm::vec2 m_normal;
+		float m_distance;
+
+		unsigned int m_VAO;	//Vertex Array Object, to contain the VBO and IBO
+		unsigned int m_VBO;	//Vertex Buffer Object, to store the array of points for the geometry
+		unsigned int m_IBO;	//Index Buffer Object, to store the indexes of the verts we want to draw
+
+		Vertex* m_vertices = nullptr;
+		int* m_indexBuffer = nullptr;
+		int m_vertexAmount;
+		int m_indexAmount;
+	};
+}
 
