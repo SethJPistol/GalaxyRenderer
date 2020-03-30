@@ -15,6 +15,10 @@ Application::Application()
 
 
 	//MESHES
+	m_pQuad = new glxy::Quad(glm::vec3(-2.0f, 0.0f, 0.0f), 1.0f, glm::vec2(0.0f, 0.5f));
+	m_pQuad2 = new glxy::Quad(glm::vec3(-2.0f, 8.0f, 0.0f), 1.0f, glm::vec2(0.0f, -0.5f));
+	m_pCircle = new glxy::Circle(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, glm::vec2(0.5f, 0.0f), 1.0f);
+	m_pCircle2 = new glxy::Circle(glm::vec3(7.0f, 0.0f, 0.0f), 1.0f, glm::vec2(-0.0f, 0.0f), 1.0f);
 	m_pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
 	m_pPoly = new glxy::Polygon(5, glm::vec3(-5.0f, -0.5f, 0.0f));
 	m_pPrism = new glxy::Prism(6, 2, glm::vec3(-7.5f, 0.5f, 0.0f));
@@ -98,6 +102,17 @@ Application::Application()
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+	//PHYSICS
+	m_pPhysicsScene = new PhysicsScene();
+	m_pPhysicsScene->SetTimeStep(0.01f);
+
+	m_pPhysicsScene->AddObject(m_pQuad);
+	m_pPhysicsScene->AddObject(m_pQuad2);
+	m_pPhysicsScene->AddObject(m_pCircle);
+	m_pPhysicsScene->AddObject(m_pCircle2);
+
+
 	m_running = true;
 }
 
@@ -109,6 +124,11 @@ Application::~Application()
 	delete pPostProcShader;
 
 	delete m_pCamera;
+
+	delete m_pQuad;
+	delete m_pQuad2;
+	delete m_pCircle;
+	delete m_pCircle2;
 	delete m_pCube;
 	delete m_pPoly;
 	delete m_pPrism;
@@ -118,6 +138,8 @@ Application::~Application()
 
 	delete m_pRenderTarget;
 	delete m_pScreen;
+
+	delete m_pPhysicsScene;
 
 	glfwDestroyWindow(m_window);
 	glfwTerminate();	//Terminate GLFW
@@ -139,6 +161,9 @@ void Application::Run()
 		lastFrame = currentFrame;
 		totalTime += deltaTime;
 
+		//Update physics
+		m_pPhysicsScene->Update(deltaTime);
+
 		//Update the camera
 		m_pCamera->Update(deltaTime);
 		glm::mat4 pv = m_pCamera->GetPV();
@@ -156,31 +181,35 @@ void Application::Run()
 		pShapeShader->UseProgram();	//Bind the shaders
 		pShapeShader->SetUniform("projection_view_matrix", pv);
 		pShapeShader->SetUniform("color", color);
-		m_pCube->Draw();
+		//m_pCube->Draw();
+		m_pQuad->Draw();
+		m_pQuad2->Draw();
+		m_pCircle->Draw();
+		m_pCircle2->Draw();
 		m_pPoly->Draw();
-		m_pPrism->Draw();
-		m_pPyramid->Draw();
+		//m_pPrism->Draw();
+		//m_pPyramid->Draw();
 
 
 		//Sprite drawing
-		pSpriteShader->UseProgram();	//Bind the shaders
-		pSpriteShader->SetUniform("projection_view_matrix", pv);
-		m_pSprite->Draw();
+		//pSpriteShader->UseProgram();	//Bind the shaders
+		//pSpriteShader->SetUniform("projection_view_matrix", pv);
+		//m_pSprite->Draw();
 
 
 		//Object drawing
-		pLitShader->UseProgram();	//Bind the shaders
-		pLitShader->SetUniform("projection_view_matrix", pv);
-		pLitShader->SetUniform("model_matrix", m_model);
-		pLitShader->SetUniform("normal_matrix", glm::inverseTranspose(glm::mat3(m_model)));	//Probably should be done separately on object itself
-		pLitShader->SetUniform("camera_position", m_pCamera->GetPosition());
-		m_directionalLights[0].direction = glm::vec3(glm::cos(totalTime), 0.0f, -glm::sin(totalTime));	//Make the first light spin
+		//pLitShader->UseProgram();	//Bind the shaders
+		//pLitShader->SetUniform("projection_view_matrix", pv);
+		//pLitShader->SetUniform("model_matrix", m_model);
+		//pLitShader->SetUniform("normal_matrix", glm::inverseTranspose(glm::mat3(m_model)));	//Probably should be done separately on object itself
+		//pLitShader->SetUniform("camera_position", m_pCamera->GetPosition());
+		//m_directionalLights[0].direction = glm::vec3(glm::cos(totalTime), 0.0f, -glm::sin(totalTime));	//Make the first light spin
 
-		for (int i = 0; i < m_directionalLights.size(); ++i)	//For all the directional lights in the scene,
-			m_directionalLights[i].Update(i);					//Set the uniform values for the light
+		//for (int i = 0; i < m_directionalLights.size(); ++i)	//For all the directional lights in the scene,
+		//	m_directionalLights[i].Update(i);					//Set the uniform values for the light
 
-		m_soldierModel.draw();
-		m_tentacleModel.draw();
+		//m_soldierModel.draw();
+		//m_tentacleModel.draw();
 
 
 		if (m_usePostProcessing)

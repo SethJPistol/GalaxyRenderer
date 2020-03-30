@@ -65,6 +65,7 @@ void Shape::SetScale(float scale)
 	m_localTransform[1][1] *= scale;
 	m_localTransform[2][2] /= m_scale;
 	m_localTransform[2][2] *= scale;
+	m_scale = scale;
 }
 
 unsigned int Shape::GetVAO()
@@ -134,6 +135,57 @@ void Cube::CreateMesh()
 }
 
 
+Quad::Quad(glm::vec3 position, float scale, glm::vec2 velocity, float mass) 
+	: Shape(position, scale), RigidBody(ShapeType::BOX, position, velocity, mass)
+{
+	CreateMesh();
+	LoadMesh();
+}
+void Quad::CreateMesh()
+{
+	m_vertexAmount = 4;
+	//Set the vertex positions
+	m_vertices = new Vertex[m_vertexAmount];
+	m_vertices[0].position = glm::vec3(-0.5f, 0.5f, 0.0f);
+	m_vertices[1].position = glm::vec3(0.5f, 0.5f, 0.0f);
+	m_vertices[2].position = glm::vec3(-0.5f, -0.5f, 0.0f);
+	m_vertices[3].position = glm::vec3(0.5f, -0.5f, 0.0f);
+
+	//Create the tris
+	m_indexAmount = 6;
+	m_indexBuffer = new int[m_indexAmount]
+	{
+		0, 2, 1, 1, 2, 3
+	};
+}
+bool Quad::CheckCollision(PhysicsObject* pOther)
+{
+	Quad* pQuad = dynamic_cast<Quad*>(pOther);
+	if (pQuad != nullptr)
+	{
+		return !(GetMax().x < pQuad->GetMin().x ||
+			GetMax().x > pQuad->GetMax().x ||
+			GetMax().y < pQuad->GetMin().y ||
+			GetMax().y > pQuad->GetMax().y);
+	}
+	return false;
+}
+void Quad::Draw()
+{
+	//Set the opengl position to the rigidbody position
+	SetPosition(glm::vec3(m_position, m_localTransform[3][2]));
+	Shape::Draw();
+}
+glm::vec2 Quad::GetMin()
+{
+	return m_position - (0.5f * glm::vec2(m_scale, m_scale));
+}
+glm::vec2 Quad::GetMax()
+{
+	return m_position + (0.5f * glm::vec2(m_scale, m_scale));
+}
+
+
 Polygon::Polygon(int sides, glm::vec3 position, float scale) : Shape(position, scale)
 {
 	m_sides = sides;
@@ -151,7 +203,7 @@ void Polygon::CreateMesh()
 	for (int i = 1; i < m_vertexAmount; ++i)
 	{
 		float currentAngle = glm::two_pi<float>() * ((float)(i - 1) / (float)m_sides);
-		m_vertices[i].position = glm::vec3(glm::cos(currentAngle), 0, -glm::sin(currentAngle));	//Sin negative to make face-up
+		m_vertices[i].position = glm::vec3(glm::cos(currentAngle), glm::sin(currentAngle), 0);	//Sin negative to make it face other way
 	}
 
 	//Create the tris
@@ -166,6 +218,39 @@ void Polygon::CreateMesh()
 		m_indexBuffer[i] = i % 3 + (int)(i * 0.33333f);
 	}
 	m_indexBuffer[m_indexAmount - 1] = 1;
+}
+
+
+Circle::Circle(glm::vec3 position, float scale, glm::vec2 velocity, float mass) 
+	: Polygon(50, position, scale), RigidBody(ShapeType::CIRCLE, position, velocity, mass)
+{
+	m_radius = m_scale;
+}
+bool Circle::CheckCollision(PhysicsObject* pOther)
+{
+	Circle* pCircle = dynamic_cast<Circle*>(pOther);
+	if (pCircle != nullptr)
+	{
+		float distance = glm::distance(m_position, pCircle->RigidBody::GetPosition());
+		if (distance < (m_radius + pCircle->GetRadius()))
+			return true;	//return glm::normalize(distance) * (m_radius + pCircle->GetRadius());
+	}
+	return false;
+}
+void Circle::SetScale(float scale)
+{
+	Shape::SetScale(scale);
+	m_radius = m_scale;
+}
+float Circle::GetRadius()
+{
+	return m_radius;
+}
+void Circle::Draw()
+{
+	//Set the opengl position to the rigidbody position
+	SetPosition(glm::vec3(m_position, m_localTransform[3][2]));
+	Shape::Draw();
 }
 
 

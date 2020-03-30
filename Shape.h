@@ -1,6 +1,7 @@
 #pragma once
 #include "glm.hpp"
 #include "..\glcore\gl_core_4_5.h"
+#include "RigidBody.h"
 
 namespace glxy
 {
@@ -22,7 +23,7 @@ namespace glxy
 		void SetPosition(glm::vec3 position);
 
 		float GetScale();
-		void SetScale(float scale);
+		virtual void SetScale(float scale);
 
 		unsigned int GetVAO();
 
@@ -56,14 +57,51 @@ namespace glxy
 	};
 
 
+	class Quad : public Shape, public RigidBody
+	{
+	public:
+		Quad(glm::vec3 position = glm::vec3(0), float scale = 1.0f,
+			glm::vec2 velocity = glm::vec2(0), float mass = 1.0f);
+
+		virtual bool CheckCollision(PhysicsObject* pOther);
+
+		void Draw();
+
+		glm::vec2 GetMin();
+		glm::vec2 GetMax();
+
+	private:
+		void CreateMesh();
+	};
+
+
 	class Polygon : public Shape
 	{
 	public:
 		Polygon(int sides = 3, glm::vec3 position = glm::vec3(0), float scale = 1.0f);
 
-	private:
+	protected:
 		void CreateMesh();
 		int m_sides;
+	};
+
+
+	class Circle : public Polygon, public RigidBody
+	{
+	public:
+		Circle(glm::vec3 position = glm::vec3(0), 
+				float scale = 1.0f,
+				glm::vec2 velocity = glm::vec2(0),
+				float mass = 1.0f);
+
+		virtual bool CheckCollision(PhysicsObject* pOther);
+		void SetScale(float scale);
+		float GetRadius();
+
+		void Draw();
+
+	protected:
+		float m_radius;
 	};
 
 
