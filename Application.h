@@ -57,15 +57,22 @@ private:
 	glxy::Camera* m_pCamera;
 
 	//Shapes
-	glxy::Quad* m_pQuad;
-	glxy::Quad* m_pQuad2;
-	glxy::Circle* m_pCircle;
-	glxy::Circle* m_pCircle2;
-	glxy::Plane* m_pPlane;
 	glxy::Cube* m_pCube;
 	glxy::Polygon* m_pPoly;
 	glxy::Prism* m_pPrism;
 	glxy::Pyramid* m_pPyramid;
+
+	//Physics shapes
+	glxy::Circle* m_pCircleLeft;
+	glxy::Circle* m_pCircleRight;
+	glxy::Circle* m_pCircleHeavy;
+	glxy::Quad* m_pBoxLeft;
+	glxy::Quad* m_pBoxRight;
+	glxy::Plane* m_pPlaneLeft;
+	glxy::Plane* m_pPlaneLeftDiagonal;
+	glxy::Plane* m_pPlaneGround;
+	glxy::Plane* m_pPlaneRightDiagonal;
+	glxy::Plane* m_pPlaneRight;
 
 	//Sprites
 	glxy::Sprite* m_pSprite;

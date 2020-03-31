@@ -173,7 +173,7 @@ bool Quad::CheckCollision(PhysicsObject* pOther)
 void Quad::Draw()
 {
 	//Set the opengl position to the rigidbody position
-	SetPosition(glm::vec3(m_position, m_localTransform[3][2]));
+	Shape::SetPosition(glm::vec3(m_position, m_localTransform[3][2]));
 	Shape::Draw();
 }
 glm::vec2 Quad::GetMin()
@@ -238,7 +238,7 @@ float Circle::GetRadius()
 void Circle::Draw()
 {
 	//Set the opengl position to the rigidbody position
-	SetPosition(glm::vec3(m_position, m_localTransform[3][2]));
+	Shape::SetPosition(glm::vec3(m_position, m_localTransform[3][2]));
 	Shape::Draw();
 }
 

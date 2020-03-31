@@ -28,13 +28,35 @@ void RigidBody::ApplyForceToObject(RigidBody* pObject, glm::vec2 force)
 	ApplyForce(-force);
 }
 
+void RigidBody::ResolveCollision(RigidBody* pOther, glm::vec2 collisionNormal)
+{
+	glm::vec2 normal = glm::normalize(collisionNormal);
+	glm::vec2 relativeVelocity = pOther->GetVelocity() - m_velocity;
+	float elasticity = 1.0f;
+
+	float j = glm::dot(-(1 + elasticity) * relativeVelocity, normal) 
+			/ glm::dot(normal, normal * ((1 / m_mass) + (1 / pOther->GetMass())));
+
+	glm::vec2 force = normal * j;
+
+	ApplyForceToObject(pOther, force);
+}
+
 glm::vec2 RigidBody::GetPosition()
 {
 	return m_position;
 }
+void RigidBody::SetPosition(glm::vec2 position)
+{
+	m_position = position;
+}
 glm::vec2 RigidBody::GetVelocity()
 {
 	return m_velocity;
+}
+void RigidBody::SetVelocity(glm::vec2 velocity)
+{
+	m_velocity = velocity;
 }
 float RigidBody::GetMass()
 {

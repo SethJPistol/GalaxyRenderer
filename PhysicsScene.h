@@ -6,7 +6,7 @@
 
 class PhysicsObject;
 
-using CollisionFunction = std::function<bool(PhysicsObject*, PhysicsObject*)>;
+using CollisionFunction = std::function<glm::vec2(PhysicsObject*, PhysicsObject*)>;
 
 class PhysicsScene
 {
@@ -21,16 +21,18 @@ public:
 
 	void SetTimeStep(float timeStep);
 	float GetTimeStep();
+	void SetGravity(glm::vec2 gravity);
+	glm::vec2 GetGravity();
 
-	static bool CircleVsCircle(PhysicsObject* pCircleA, PhysicsObject* pCircleB);
-	static bool CircleVsBox(PhysicsObject* pCircle, PhysicsObject* pBox);
-	static bool CircleVsPlane(PhysicsObject* pCircle, PhysicsObject* pPlane);
-	static bool BoxVsCircle(PhysicsObject* pBox, PhysicsObject* pCircle);
-	static bool BoxVsBox(PhysicsObject* pBoxA, PhysicsObject* pBoxB);
-	static bool BoxVsPlane(PhysicsObject* pBox, PhysicsObject* pPlane);
-	static bool PlaneVsCircle(PhysicsObject* pPlane, PhysicsObject* pCircle);
-	static bool PlaneVsBox(PhysicsObject* pPlane, PhysicsObject* pBox);
-	static bool PlaneVsPlane(PhysicsObject* pPlaneA, PhysicsObject* pPlaneB);
+	static glm::vec2 CircleVsCircle(PhysicsObject* pCircleA, PhysicsObject* pCircleB);
+	static glm::vec2 CircleVsBox(PhysicsObject* pCircle, PhysicsObject* pBox);
+	static glm::vec2 CircleVsPlane(PhysicsObject* pCircle, PhysicsObject* pPlane);
+	static glm::vec2 BoxVsCircle(PhysicsObject* pBox, PhysicsObject* pCircle);
+	static glm::vec2 BoxVsBox(PhysicsObject* pBoxA, PhysicsObject* pBoxB);
+	static glm::vec2 BoxVsPlane(PhysicsObject* pBox, PhysicsObject* pPlane);
+	static glm::vec2 PlaneVsCircle(PhysicsObject* pPlane, PhysicsObject* pCircle);
+	static glm::vec2 PlaneVsBox(PhysicsObject* pPlane, PhysicsObject* pBox);
+	static glm::vec2 PlaneVsPlane(PhysicsObject* pPlaneA, PhysicsObject* pPlaneB);
 
 protected:
 	glm::vec2 m_gravity;

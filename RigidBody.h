@@ -12,8 +12,12 @@ public:
 	void ApplyForce(glm::vec2 force);
 	void ApplyForceToObject(RigidBody* pObject, glm::vec2 force);
 
+	void ResolveCollision(RigidBody* pOther, glm::vec2 collisionNormal);
+
 	glm::vec2 GetPosition();
+	void SetPosition(glm::vec2 position);
 	glm::vec2 GetVelocity();
+	void SetVelocity(glm::vec2 velocity);
 	float GetMass();
 
 

@@ -15,18 +15,29 @@ Application::Application()
 
 
 	//MESHES
-	m_pQuad = new glxy::Quad(glm::vec3(-2.0f, 0.0f, 0.0f), 1.0f, glm::vec2(0.0f, 0.5f));
-	m_pQuad2 = new glxy::Quad(glm::vec3(-2.0f, 3.0f, 0.0f), 1.0f, glm::vec2(0.0f, -0.5f));
-	m_pCircle = new glxy::Circle(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, glm::vec2(0.5f, -0.5f), 1.0f);
-	m_pCircle2 = new glxy::Circle(glm::vec3(4.0f, 0.0f, 0.0f), 1.0f, glm::vec2(-0.0f, 0.0f), 1.0f);
-	m_pPlane = new glxy::Plane(glm::vec2(0.0f, 1.0f), -2.0f);
+	//Shapes
 	m_pCube = new glxy::Cube(glm::vec3(-3.0f, 0.0f, 0.0f));
 	m_pPoly = new glxy::Polygon(5, glm::vec3(-5.0f, -0.5f, 0.0f));
 	m_pPrism = new glxy::Prism(6, 2, glm::vec3(-7.5f, 0.5f, 0.0f));
 	m_pPyramid = new glxy::Pyramid(8, 2, glm::vec3(-10.0f, 0.5f, 0.0f));
 
+	//Physics shapes
+	m_pCircleLeft = new glxy::Circle(glm::vec3(-3.0f, 0.0f, 0.0f), 1.0f, glm::vec2(1.5f, 0.0f), 1.0f);
+	m_pCircleRight = new glxy::Circle(glm::vec3(3.0f, 0.0f, 0.0f), 1.0f, glm::vec2(-1.6f, 0.0f), 1.0f);
+	m_pCircleHeavy = new glxy::Circle(glm::vec3(0.0f, 6.0f, 0.0f), 2.0f, glm::vec2(0.0f, 0.0f), 3.0f);
+	m_pBoxLeft = new glxy::Quad(glm::vec3(-3.0f, -3.0f, 0.0f), 1.0f, glm::vec2(1.6f, 0.0f));
+	m_pBoxRight = new glxy::Quad(glm::vec3(3.0f, -3.0f, 0.0f), 1.0f, glm::vec2(-1.5f, 0.0f));
+	
+	m_pPlaneLeft = new glxy::Plane(glm::vec2(1.0f, 0.0f), -8.0f);
+	m_pPlaneLeftDiagonal = new glxy::Plane(glm::vec2(1.0f, 1.0f), -8.0f);
+	m_pPlaneGround = new glxy::Plane(glm::vec2(0.0f, 1.0f), -8.0f);
+	m_pPlaneRightDiagonal = new glxy::Plane(glm::vec2(-1.0f, 1.0f), -8.0f);
+	m_pPlaneRight = new glxy::Plane(glm::vec2(-1.0f, 0.0f), -8.0f);
+
+	//Sprites
 	m_pSprite = new glxy::Sprite(glm::vec3(5.0f, 0.0f, 0.0f));
 
+	//Models
 	bool loaded = m_soldierModel.load("Assets\\WinterSoldier\\Model\\CharAS.obj");
 	m_soldierModel.SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
 	m_soldierModel.SetScale(0.1f);
@@ -58,7 +69,7 @@ Application::Application()
 
 	//CAMERA
 	m_model = glm::mat4(1);
-	m_pCamera = new glxy::Camera(glm::vec3(0, 2, 4), glm::vec3(0, 1, 0));
+	m_pCamera = new glxy::Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, 0));
 
 
 	//SHADERS
@@ -107,13 +118,18 @@ Application::Application()
 	//PHYSICS
 	m_pPhysicsScene = new PhysicsScene();
 	m_pPhysicsScene->SetTimeStep(0.01f);
+	m_pPhysicsScene->SetGravity(glm::vec2(0.0f, -8.0f));
 
-	m_pPhysicsScene->AddObject(m_pQuad);
-	m_pPhysicsScene->AddObject(m_pQuad2);
-	m_pPhysicsScene->AddObject(m_pCircle);
-	m_pPhysicsScene->AddObject(m_pCircle2);
-	m_pPhysicsScene->AddObject(m_pPlane);
-
+	m_pPhysicsScene->AddObject(m_pCircleLeft);
+	m_pPhysicsScene->AddObject(m_pCircleRight);
+	m_pPhysicsScene->AddObject(m_pCircleHeavy);
+	m_pPhysicsScene->AddObject(m_pBoxLeft);
+	m_pPhysicsScene->AddObject(m_pBoxRight);
+	m_pPhysicsScene->AddObject(m_pPlaneLeft);
+	m_pPhysicsScene->AddObject(m_pPlaneLeftDiagonal);
+	m_pPhysicsScene->AddObject(m_pPlaneGround);
+	m_pPhysicsScene->AddObject(m_pPlaneRightDiagonal);
+	m_pPhysicsScene->AddObject(m_pPlaneRight);
 
 	m_running = true;
 }
@@ -127,15 +143,21 @@ Application::~Application()
 
 	delete m_pCamera;
 
-	delete m_pQuad;
-	delete m_pQuad2;
-	delete m_pCircle;
-	delete m_pCircle2;
-	delete m_pPlane;
 	delete m_pCube;
 	delete m_pPoly;
 	delete m_pPrism;
 	delete m_pPyramid;
+
+	delete m_pCircleLeft;
+	delete m_pCircleRight;
+	delete m_pCircleHeavy;
+	delete m_pBoxLeft;
+	delete m_pBoxRight;
+	delete m_pPlaneLeft;
+	delete m_pPlaneLeftDiagonal;
+	delete m_pPlaneGround;
+	delete m_pPlaneRightDiagonal;
+	delete m_pPlaneRight;
 
 	delete m_pSprite;
 
@@ -185,19 +207,32 @@ void Application::Run()
 
 
 		//Shape drawing
-		glm::vec4 color = glm::vec4(0.3f, 0.3f, 0.85f, 1.0f);
 		pShapeShader->UseProgram();	//Bind the shaders
 		pShapeShader->SetUniform("projection_view_matrix", pv);
-		pShapeShader->SetUniform("color", color);
-		//m_pCube->Draw();
-		m_pQuad->Draw();
-		m_pQuad2->Draw();
-		m_pCircle->Draw();
-		m_pCircle2->Draw();
-		m_pPlane->Draw();
-		//m_pPoly->Draw();
-		//m_pPrism->Draw();
-		//m_pPyramid->Draw();
+
+		glm::vec4 colorMidnightBlue = glm::vec4(11, 27, 62, 255) / 255.0f;
+		glm::vec4 colorDarkSlateGrey = glm::vec4(41, 101, 111, 255) / 255.0f;
+		glm::vec4 colorDarkSeaGreen = glm::vec4(156, 201, 156, 255) / 255.0f;
+		glm::vec4 colorDarkKhaki = glm::vec4(178, 205, 99, 255) / 255.0f;
+		glm::vec4 colorKhaki = glm::vec4(206, 220, 153, 255) / 255.0f;
+
+		pShapeShader->SetUniform("color", colorDarkSlateGrey);
+		m_pCircleLeft->Draw();
+		m_pCircleRight->Draw();
+
+		pShapeShader->SetUniform("color", colorDarkSeaGreen);
+		m_pCircleHeavy->Draw();
+
+		pShapeShader->SetUniform("color", colorDarkKhaki);
+		m_pBoxLeft->Draw();
+		m_pBoxRight->Draw();
+
+		pShapeShader->SetUniform("color", colorMidnightBlue);
+		m_pPlaneLeft->Draw();
+		m_pPlaneLeftDiagonal->Draw();
+		m_pPlaneGround->Draw();
+		m_pPlaneRightDiagonal->Draw();
+		m_pPlaneRight->Draw();
 
 
 		//Sprite drawing
@@ -244,35 +279,31 @@ void Application::Run()
 		}
 
 
-		//Cube movement
+		//Circle movement
 		bool inputFlag = false;
-		glm::vec3 displacement = glm::vec3(0);
+		glm::vec3 direction = glm::vec3(0);
 		if (glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)
 		{
-			displacement -= glm::vec3(0.0f, 0.0f, 1.0f);
+			direction -= glm::vec3(0.0f, 0.0f, 1.0f);
 			inputFlag = true;
 		}
 		if (glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		{
-			displacement += glm::vec3(0.0f, 0.0f, 1.0f);
+			direction += glm::vec3(0.0f, 0.0f, 1.0f);
 			inputFlag = true;
 		}
 		if (glfwGetKey(m_window, GLFW_KEY_LEFT) == GLFW_PRESS)
 		{
-			displacement -= glm::vec3(1.0f, 0.0f, 0.0f);
+			direction -= glm::vec3(1.0f, 0.0f, 0.0f);
 			inputFlag = true;
 		}
 		if (glfwGetKey(m_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		{
-			displacement += glm::vec3(1.0f, 0.0f, 0.0f);
+			direction += glm::vec3(1.0f, 0.0f, 0.0f);
 			inputFlag = true;
 		}
-
 		if (inputFlag)
-		{
-			m_pCube->SetPosition((m_pCube->GetPosition()) + displacement * 2.0f * deltaTime);
-			glm::vec3 pos = m_pCube->GetPosition();
-		}
+			m_pCircleHeavy->ApplyForce(direction);
 
 
 		glfwSwapBuffers(m_window);	//Update the monitor display, swapping with the rendered back buffer

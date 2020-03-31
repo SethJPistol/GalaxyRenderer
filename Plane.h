@@ -1,6 +1,8 @@
 #pragma once
 #include "PhysicsObject.h"
 
+class RigidBody;
+
 namespace glxy
 {
 	class Plane : public PhysicsObject
@@ -21,6 +23,8 @@ namespace glxy
 		virtual void FixedUpdate(glm::vec2 gravity, float timeStep);
 
 		void Draw();
+
+		void ResolveCollision(RigidBody* pOther);
 
 		glm::vec2 GetNormal();
 		float GetDistance();

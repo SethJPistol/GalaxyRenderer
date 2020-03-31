@@ -1,4 +1,5 @@
 #include "Plane.h"
+#include "RigidBody.h"
 
 #include "glm.hpp"
 #include "..\glcore\gl_core_4_5.h"
@@ -9,7 +10,7 @@ using namespace glxy;
 
 Plane::Plane(glm::vec2 normal, float distance) : PhysicsObject(ShapeType::PLANE)
 {
-	m_normal = normal;
+	m_normal = glm::normalize(normal);
 	m_distance = distance;
 
 	CreateMesh();
@@ -94,6 +95,19 @@ void Plane::Draw()
 	//Binding and drawing arrays
 	glBindVertexArray(m_VAO);
 	glDrawElements(GL_LINES, m_indexAmount, GL_UNSIGNED_INT, 0);	//Used for drawing using the IBO
+}
+
+void Plane::ResolveCollision(RigidBody* pOther)
+{
+	glm::vec2 relativeVelocity = pOther->GetVelocity();
+	float elasticity = 1.0f;
+
+	float j = glm::dot(-(1 + elasticity) * relativeVelocity, m_normal)
+		/ glm::dot(m_normal, m_normal * (1 / pOther->GetMass()));
+
+	glm::vec2 force = m_normal * j;
+
+	pOther->ApplyForce(force);
 }
 
 glm::vec2 Plane::GetNormal()
