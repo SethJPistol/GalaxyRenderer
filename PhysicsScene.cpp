@@ -23,10 +23,12 @@ PhysicsScene::PhysicsScene()
 }
 PhysicsScene::~PhysicsScene()
 {
-	while (!m_pObjects.empty())
+	for (int i = 0; i < m_pObjects.size(); ++i)
 	{
-		m_pObjects.erase(m_pObjects.end() - 1);
+		delete m_pObjects[i];
+		m_pObjects[i] = nullptr;
 	}
+	m_pObjects.clear();
 }
 
 void PhysicsScene::Update(float deltaTime)
@@ -45,30 +47,6 @@ void PhysicsScene::Update(float deltaTime)
 	}
 
 	//Collision check all physics objects
-	//static std::list<PhysicsObject*> pDirty;	//Tracks which objects have already collided
-	//for (auto pObject : m_pObjects)
-	//{
-	//	for (auto pOther : m_pObjects)
-	//	{
-	//		if (pObject == pOther)
-	//			continue;
-
-	//		if (std::find(pDirty.begin(), pDirty.end(), pObject) != pDirty.end()
-	//			&& std::find(pDirty.begin(), pDirty.end(), pOther) != pDirty.end())
-	//			continue;
-
-	//		RigidBody* pRb = dynamic_cast<RigidBody*>(pObject);
-	//		if (pRb->CheckCollision(pOther) == true)
-	//		{
-	//			glm::vec2 force = pRb->GetVelocity() * pRb->GetMass();
-	//			pRb->ApplyForceToObject(dynamic_cast<RigidBody*>(pOther), force);
-	//			pDirty.push_back(pObject);
-	//			pDirty.push_back(pOther);
-	//		}
-	//	}
-	//}
-	//pDirty.clear();
-
 	for (int outer = 0; outer < objectCount - 1; ++outer)
 	{
 		for (int inner = outer + 1; inner < objectCount; ++inner)
@@ -97,9 +75,10 @@ void PhysicsScene::Update(float deltaTime)
 
 					if (pRb1 != nullptr && pRb2 != nullptr)
 					{
-						//Collision separation
+						//Collision restitution
 						pRb1->RigidBody::SetPosition(pRb1->GetPosition() + 0.5f * resultNormal);
 						pRb2->RigidBody::SetPosition(pRb2->GetPosition() - 0.5f * resultNormal);
+						//Collision resolution
 						pRb1->ResolveCollision(pRb2, resultNormal);
 					}
 					else if (pRb1 != nullptr)

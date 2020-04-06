@@ -19,7 +19,9 @@ Shape::~Shape()
 	glDeleteBuffers(1, &m_VBO);
 
 	delete[] m_vertices;
+	m_vertices = nullptr;
 	delete[] m_indexBuffer;
+	m_indexBuffer = nullptr;
 }
 
 void Shape::Draw()
@@ -193,6 +195,10 @@ Polygon::Polygon(int sides, glm::vec3 position, float scale) : Shape(position, s
 		m_sides = 3;
 	CreateMesh();
 	LoadMesh();
+}
+Polygon::~Polygon()
+{
+
 }
 void Polygon::CreateMesh()
 {

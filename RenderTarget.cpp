@@ -69,6 +69,7 @@ RenderTarget::RenderTarget(unsigned int targetCount, unsigned int width, unsigne
 RenderTarget::~RenderTarget() 
 {
 	delete[] m_targets;
+	m_targets = nullptr;
 	glDeleteRenderbuffers(1, &m_rbo);
 	glDeleteFramebuffers(1, &m_fbo);
 }

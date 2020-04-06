@@ -4,8 +4,8 @@
 class RigidBody : public PhysicsObject
 {
 public:
-	RigidBody(ShapeType shape, glm::vec2 position, glm::vec2 velocity, float mass);
-	~RigidBody();
+	RigidBody(ShapeType shape, glm::vec2 position, glm::vec2 velocity, float mass, float drag = 0.01f);
+	virtual ~RigidBody();
 
 	virtual void FixedUpdate(glm::vec2 gravity, float timeStep);
 
@@ -19,6 +19,8 @@ public:
 	glm::vec2 GetVelocity();
 	void SetVelocity(glm::vec2 velocity);
 	float GetMass();
+	void SetDrag(float drag);
+	float GetDrag();
 
 
 protected:
@@ -26,5 +28,6 @@ protected:
 	glm::vec2 m_position;
 	glm::vec2 m_velocity;
 	float m_mass;
+	float m_drag;
 };
 

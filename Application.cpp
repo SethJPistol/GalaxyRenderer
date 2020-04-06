@@ -33,6 +33,11 @@ Application::Application()
 	m_pPlaneGround = new glxy::Plane(glm::vec2(0.0f, 1.0f), -8.0f);
 	m_pPlaneRightDiagonal = new glxy::Plane(glm::vec2(-1.0f, 1.0f), -8.0f);
 	m_pPlaneRight = new glxy::Plane(glm::vec2(-1.0f, 0.0f), -8.0f);
+	//m_pPlaneLeft->SetElasticity(0.0f);
+	//m_pPlaneLeftDiagonal->SetElasticity(0.0f);
+	//m_pPlaneGround->SetElasticity(0.0f);
+	//m_pPlaneRightDiagonal->SetElasticity(0.0f);
+	//m_pPlaneRight->SetElasticity(0.0f);
 
 	//Sprites
 	m_pSprite = new glxy::Sprite(glm::vec3(5.0f, 0.0f, 0.0f));
@@ -118,7 +123,7 @@ Application::Application()
 	//PHYSICS
 	m_pPhysicsScene = new PhysicsScene();
 	m_pPhysicsScene->SetTimeStep(0.01f);
-	m_pPhysicsScene->SetGravity(glm::vec2(0.0f, -8.0f));
+	m_pPhysicsScene->SetGravity(glm::vec2(0.0f, -9.87f));
 
 	m_pPhysicsScene->AddObject(m_pCircleLeft);
 	m_pPhysicsScene->AddObject(m_pCircleRight);
@@ -136,35 +141,38 @@ Application::Application()
 
 Application::~Application()
 {
+	delete m_pPhysicsScene;
+	m_pPhysicsScene = nullptr;
+
 	delete pShapeShader;
+	pShapeShader = nullptr;
 	delete pSpriteShader;
+	pSpriteShader = nullptr;
 	delete pLitShader;
+	pLitShader = nullptr;
 	delete pPostProcShader;
+	pPostProcShader = nullptr;
 
 	delete m_pCamera;
+	m_pCamera = nullptr;
 
 	delete m_pCube;
+	m_pCube = nullptr;
 	delete m_pPoly;
+	m_pPoly = nullptr;
 	delete m_pPrism;
+	m_pPrism = nullptr;
 	delete m_pPyramid;
-
-	delete m_pCircleLeft;
-	delete m_pCircleRight;
-	delete m_pCircleHeavy;
-	delete m_pBoxLeft;
-	delete m_pBoxRight;
-	delete m_pPlaneLeft;
-	delete m_pPlaneLeftDiagonal;
-	delete m_pPlaneGround;
-	delete m_pPlaneRightDiagonal;
-	delete m_pPlaneRight;
+	m_pPyramid = nullptr;
 
 	delete m_pSprite;
+	m_pSprite = nullptr;
 
 	delete m_pRenderTarget;
+	m_pRenderTarget = nullptr;
 	delete m_pScreen;
+	m_pScreen = nullptr;
 
-	delete m_pPhysicsScene;
 
 	glfwDestroyWindow(m_window);
 	glfwTerminate();	//Terminate GLFW
@@ -284,12 +292,12 @@ void Application::Run()
 		glm::vec3 direction = glm::vec3(0);
 		if (glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)
 		{
-			direction -= glm::vec3(0.0f, 0.0f, 1.0f);
+			direction += glm::vec3(0.0f, 1.0f, 0.0f);
 			inputFlag = true;
 		}
 		if (glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		{
-			direction += glm::vec3(0.0f, 0.0f, 1.0f);
+			direction -= glm::vec3(0.0f, 1.0f, 0.0f);
 			inputFlag = true;
 		}
 		if (glfwGetKey(m_window, GLFW_KEY_LEFT) == GLFW_PRESS)

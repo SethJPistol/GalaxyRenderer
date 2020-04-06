@@ -27,7 +27,9 @@ ScreenMesh::~ScreenMesh()
 	glDeleteTextures(1, &m_screenTexture);
 
 	delete[] m_vertices;
+	m_vertices = nullptr;
 	delete[] m_indexBuffer;
+	m_indexBuffer = nullptr;
 }
 
 void ScreenMesh::LoadTexture(unsigned int textureHandle)

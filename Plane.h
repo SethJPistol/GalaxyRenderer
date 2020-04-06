@@ -15,7 +15,7 @@ namespace glxy
 		};
 
 		Plane(glm::vec2 normal = glm::vec2(0.0f, 1.0f), float distance = -1.0f);
-		~Plane();
+		virtual ~Plane() override;
 
 		void CreateMesh();
 		void LoadMesh();

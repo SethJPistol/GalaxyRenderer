@@ -27,7 +27,9 @@ Sprite::~Sprite()
 	glDeleteTextures(1, &m_texture);
 
 	delete[] m_vertices;
+	m_vertices = nullptr;
 	delete[] m_indexBuffer;
+	m_indexBuffer = nullptr;
 }
 
 void Sprite::LoadTexture(const char* texturePath)

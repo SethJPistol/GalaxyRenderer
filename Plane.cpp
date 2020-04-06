@@ -23,7 +23,9 @@ Plane::~Plane()
 	glDeleteBuffers(1, &m_VBO);
 
 	delete[] m_vertices;
+	m_vertices = nullptr;
 	delete[] m_indexBuffer;
+	m_indexBuffer = nullptr;
 }
 
 void Plane::CreateMesh()
@@ -100,9 +102,8 @@ void Plane::Draw()
 void Plane::ResolveCollision(RigidBody* pOther)
 {
 	glm::vec2 relativeVelocity = pOther->GetVelocity();
-	float elasticity = 1.0f;
 
-	float j = glm::dot(-(1 + elasticity) * relativeVelocity, m_normal)
+	float j = glm::dot(-(1 + (m_elasticity * pOther->GetElasticity())) * relativeVelocity, m_normal)
 		/ glm::dot(m_normal, m_normal * (1 / pOther->GetMass()));
 
 	glm::vec2 force = m_normal * j;

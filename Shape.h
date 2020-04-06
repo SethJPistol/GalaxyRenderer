@@ -15,7 +15,7 @@ namespace glxy
 		};
 
 		Shape(glm::vec3 position = glm::vec3(0), float scale = 1.0f);
-		~Shape();
+		virtual ~Shape();
 
 		virtual void Draw();
 
@@ -79,12 +79,12 @@ namespace glxy
 	{
 	public:
 		Polygon(int sides = 3, glm::vec3 position = glm::vec3(0), float scale = 1.0f);
+		virtual ~Polygon();
 
 	protected:
 		void CreateMesh();
 		int m_sides;
 	};
-
 
 	class Circle : public Polygon, public RigidBody
 	{
