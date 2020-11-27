@@ -40,14 +40,14 @@ Application::Application()
 	//m_pPlaneRight->SetElasticity(0.0f);
 
 	//Sprites
-	m_pSprite = new glxy::Sprite(glm::vec3(5.0f, 0.0f, 0.0f));
+	m_pSprite = new glxy::Sprite(glm::vec3(17.0f, -6.5f, 0.0f));
 
 	//Models
 	bool loaded = m_soldierModel.load("Assets\\WinterSoldier\\Model\\CharAS.obj");
-	m_soldierModel.SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
+	m_soldierModel.SetPosition(glm::vec3(12.0f, -7.0f, 0.0f));
 	m_soldierModel.SetScale(0.1f);
 	bool loaded2 = m_tentacleModel.load("Assets\\Tentacle\\Model\\Tentacle.obj");
-	m_tentacleModel.SetPosition(glm::vec3(3.0f, -0.5f, 0.0f));
+	m_tentacleModel.SetPosition(glm::vec3(15.0f, -7.0f, 0.0f));
 	m_tentacleModel.SetScale(0.01f);
 
 
@@ -86,6 +86,7 @@ Application::Application()
 
 
 	//LIGHTING
+	//When adding/subtracting lights, change the #define in the lit fragment shader too
 	m_directionalLights.push_back(glxy::DirectionalLight());
 	m_directionalLights[0].direction = glm::vec3(-1.0f, 0.0f, 0.0f);
 	m_directionalLights[0].ambient = glm::vec3(0.0f, 0.2f, 0.0f);
@@ -96,6 +97,11 @@ Application::Application()
 	m_directionalLights[1].ambient = glm::vec3(0.2f, 0.0f, 0.0f);
 	m_directionalLights[1].diffuse = glm::vec3(1.0f, 0.7f, 0.7f);
 	m_directionalLights[1].specular = glm::vec3(0.7f, 0.2f, 0.2f);
+	m_directionalLights.push_back(glxy::DirectionalLight());
+	m_directionalLights[2].direction = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_directionalLights[2].ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+	m_directionalLights[2].diffuse = glm::vec3(0.6f, 0.6f, 0.9f);
+	m_directionalLights[2].specular = glm::vec3(0.2f, 0.2f, 0.2f);
 
 
 	//POST-PROCESSING
@@ -244,24 +250,31 @@ void Application::Run()
 
 
 		//Sprite drawing
-		//pSpriteShader->UseProgram();	//Bind the shaders
-		//pSpriteShader->SetUniform("projection_view_matrix", pv);
+		pSpriteShader->UseProgram();	//Bind the shaders
+		pSpriteShader->SetUniform("projection_view_matrix", pv);
 		//m_pSprite->Draw();
 
 
 		//Object drawing
-		//pLitShader->UseProgram();	//Bind the shaders
-		//pLitShader->SetUniform("projection_view_matrix", pv);
-		//pLitShader->SetUniform("model_matrix", m_model);
-		//pLitShader->SetUniform("normal_matrix", glm::inverseTranspose(glm::mat3(m_model)));	//Probably should be done separately on object itself
-		//pLitShader->SetUniform("camera_position", m_pCamera->GetPosition());
-		//m_directionalLights[0].direction = glm::vec3(glm::cos(totalTime), 0.0f, -glm::sin(totalTime));	//Make the first light spin
+		pLitShader->UseProgram();	//Bind the shaders
+		pLitShader->SetUniform("projection_view_matrix", pv);
+		pLitShader->SetUniform("model_matrix", m_model);
+		pLitShader->SetUniform("normal_matrix", glm::inverseTranspose(glm::mat3(m_model)));	//Probably should be done separately on object itself
+		pLitShader->SetUniform("camera_position", m_pCamera->GetPosition());
 
-		//for (int i = 0; i < m_directionalLights.size(); ++i)	//For all the directional lights in the scene,
-		//	m_directionalLights[i].Update(i);					//Set the uniform values for the light
+		m_directionalLights[0].direction = glm::vec3(glm::cos(totalTime), 0.0f, -glm::sin(totalTime));	//Make the first light spin
 
-		//m_soldierModel.draw();
-		//m_tentacleModel.draw();
+		for (int i = 0; i < m_directionalLights.size(); ++i)	//For all the directional lights in the scene,
+			m_directionalLights[i].Update(i);					//Set the uniform values for the light
+
+		//Lighting doesn't work for these, since they don't have normals yet
+		//m_pCube->Draw();
+		//m_pPoly->Draw();
+		//m_pPrism->Draw();
+		//m_pPyramid->Draw();
+
+		m_soldierModel.draw();
+		m_tentacleModel.draw();
 
 
 		if (m_usePostProcessing)

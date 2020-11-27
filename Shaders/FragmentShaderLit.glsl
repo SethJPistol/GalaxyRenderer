@@ -20,7 +20,7 @@ uniform sampler2D normal_texture;
 
 uniform vec3 camera_position;
 
-#define D_LIGHT_AMOUNT 2
+#define D_LIGHT_AMOUNT 3
 uniform DirectionalLight directional_lights[D_LIGHT_AMOUNT];
 
 uniform vec3 material_ambient;

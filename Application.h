@@ -49,7 +49,7 @@ private:
 	//Post-processing
 	glxy::RenderTarget* m_pRenderTarget = nullptr;
 	glxy::ScreenMesh* m_pScreen = nullptr;
-	bool m_usePostProcessing = false;
+	bool m_usePostProcessing = true;
 	int m_effectToUse = 0;
 	bool m_EKeyHeld = false;
 
